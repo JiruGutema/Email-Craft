@@ -5,10 +5,13 @@ import { UsersService } from 'src/users/users.service';
 import { UsersModule } from 'src/users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { profileEnd } from 'console';
+import { PassportModule } from '@nestjs/passport';
+import { AuthV2Controller } from './passport-auth.controller';
+import { LocalStrategy } from './strategies/local.strategy';
 
 @Module({
-  controllers: [AuthController],
-  providers: [AuthService],
+  controllers: [AuthController, AuthV2Controller],
+  providers: [AuthService, LocalStrategy],
   imports: [
     UsersModule,
     JwtModule.registerAsync({
@@ -18,6 +21,7 @@ import { profileEnd } from 'console';
         signOptions: { expiresIn: '1d' },
       }),
     }),
+    PassportModule
   ],
 })
 export class AuthModule {}
