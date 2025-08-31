@@ -15,7 +15,7 @@ import { profileEnd } from 'console';
       global: true,
       useFactory: () => ({
         secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '1s' },
+        signOptions: { expiresIn: '1d' },
       }),
     }),
   ],

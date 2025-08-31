@@ -19,8 +19,8 @@ export class UsersService {
     return users;
   }
 
- async findOne(id: string) {
-    const user =  users.find(user => user.userId === id);
+ async findOne(username: string) {
+    const user =  users.find(user => user.username === username);
     if (!user){
       return null;
     }

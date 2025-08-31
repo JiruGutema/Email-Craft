@@ -25,7 +25,7 @@ export class AuthService {
     return { message: 'Invalid password' };
   }
 
-  async me(userId: string) {
-    return this.usersService.findOne(userId);
+  async me(username: string) {
+    return this.usersService.findOne(username);
   }
 }
