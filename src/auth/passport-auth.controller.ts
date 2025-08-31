@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto } from './dto/create-auth.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { PassportLocalGuard } from './guards/passport-local.guard';
+import { PassportJwtAuthGuard } from './guards/passport-jwt.guard';
 
 @Controller('auth-v2')
 export class AuthV2Controller {
@@ -14,10 +15,10 @@ export class AuthV2Controller {
     return this.authService.login(createAuthDto);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(PassportJwtAuthGuard)
   @Get('me')
   me(@Request() request) {
-    return this.authService.me(request.user.username);
+    return request.user;
   }
 }
 

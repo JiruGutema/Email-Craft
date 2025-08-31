@@ -8,10 +8,11 @@ import { profileEnd } from 'console';
 import { PassportModule } from '@nestjs/passport';
 import { AuthV2Controller } from './passport-auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
   controllers: [AuthController, AuthV2Controller],
-  providers: [AuthService, LocalStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
   imports: [
     UsersModule,
     JwtModule.registerAsync({
