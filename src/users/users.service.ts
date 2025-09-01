@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { users } from './mock/users.mock';
+import {PrismaClient } from '@prisma/client';
+import { SignupUserDto } from 'src/auth/dto/create-auth.dto';
+const Prisma = new PrismaClient();
 
 @Injectable()
 export class UsersService {
-  async create(createUserDto: CreateUserDto) {
-    const new_user = createUserDto;
-    const existingUser = users.find(user => user.email === new_user.email || user.username === new_user.username);
-    if (existingUser) {
+  async create(signupUserDto: SignupUserDto) {
+    const new_user = signupUserDto;
+    const existingUser = await Prisma.users.findMany({
+      where: {
+        OR: [
+          { email: new_user.email },
+          { username: new_user.username },
+        ],
+      },
+    });
+
+    if (existingUser.length > 0) {
       return {message: 'User with this email or username already exists'};
     }
-    users.push(new_user);
-    return {message: 'User created successfully', user: new_user};
+    const createdUser = await Prisma.users.create({
+      data: new_user,
+    });
+    return {message: 'User created successfully', user: createdUser};
   }
 
  async findAll() {
-    return users;
+    return await Prisma.users.findMany();
   }
 
- async findOne(username: string) {
-    const user =  users.find(user => user.username === username);
+ async findOne(id: string) {
+    const user = await Prisma.users.findUnique({
+      where: { id },
+    });
     if (!user){
       return null;
     }
@@ -28,24 +42,53 @@ export class UsersService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const userIndex = users.findIndex(user => user.userId === id);
-    if (userIndex == -1){
-      return {message: `User with id ${id} not found`};
+    const user = await Prisma.users.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      return { message: `User with id ${id} not found` };
     }
-    else if (userIndex !== -1) {
-      users[userIndex] = { ...users[userIndex], ...updateUserDto };
-    }
+    const updatedUser = await Prisma.users.update({
+      where: { id },
+      data: updateUserDto,
+    });
+    
+    return { message: 'User updated successfully', user: updatedUser };
   }
 
-  async remove(id: string) {
-    const userIndex = users.findIndex(user => user.userId === id);
-    if (userIndex == -1){
-      return {message: `User with id ${id} not found`};
+  async delete(id: string) {
+    const user = await Prisma.users.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      return { message: `User with id ${id} not found` };
     }
-    else if (userIndex !== -1) {
-      users.splice(userIndex, 1);
-    }
+    await Prisma.users.delete({
+      where: { id },
+    });
+    return { message: 'User deleted successfully' };
   }
+  async findOrCreateUser(profile: any) {
+    const { email, name, picture } = profile._json;
 
+    let user = await Prisma.users.findUnique({
+      where: { email },
+    });
 
+    if (!user) {
+      const username = email.split('@')[0];
+      const password = "_google_oauth_user_";
+      user = await Prisma.users.create({
+        data: {
+          email,
+          name,
+          password,
+          picture,
+          username,
+        },
+      });
+    }
+
+    return {user: {id: user.id, email: user.email, name: user.name, picture: user.picture}};
+  }
 }

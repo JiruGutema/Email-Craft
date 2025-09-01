@@ -9,10 +9,11 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthV2Controller } from './passport-auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   controllers: [AuthController, AuthV2Controller],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
   imports: [
     UsersModule,
     JwtModule.registerAsync({
@@ -22,7 +23,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
         signOptions: { expiresIn: '1d' },
       }),
     }),
-    PassportModule
+    PassportModule,
+
   ],
 })
 export class AuthModule {}

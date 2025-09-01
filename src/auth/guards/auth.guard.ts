@@ -1,7 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
-
+import { PrismaClient } from '@prisma/client';
+const Prisma = new PrismaClient();
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
@@ -15,11 +16,15 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException("No token provided");
     }
+    if(request.user.password === "_google_oauth_user_") {
+      throw new UnauthorizedException("Google OAuth users are not allowed. Try logging in with Google.");
+    }
     try {
-      const tokenPayload = await this.jwtService.verifyAsync(token);
-      request.user = {
-        userId: tokenPayload.sub,
-        username: tokenPayload.username,
+        
+        const tokenPayload = await this.jwtService.verifyAsync(token);
+        request.user = {
+          userId: tokenPayload.sub,
+          username: tokenPayload.username,
       };
       return true;
     } catch (error) {
@@ -28,5 +33,19 @@ export class AuthGuard implements CanActivate {
       }
       throw new UnauthorizedException('Invalid token');
     }
+  }
+
+}
+
+@Injectable()
+export class CanLogin implements CanActivate{
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.body;
+    console.log('CanLogin Guard - User:', user);
+    if (user && user.password === "_google_oauth_user_") {
+      throw new UnauthorizedException("Google OAuth users are not allowed. Try logging in with Google.");
+    }
+    return true;
   }
 }
