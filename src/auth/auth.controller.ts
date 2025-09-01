@@ -7,7 +7,7 @@ import { GoogleAuthGuard } from './guards/google.guard';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-  
+
   @UseGuards(CanLogin)
   @Post('login')
   login(@Body() createAuthDto: CreateAuthDto) {
@@ -31,7 +31,6 @@ export class AuthController {
 @UseGuards(GoogleAuthGuard)
  @Get('google/callback')
   async googleAuthRedirect(@Req() req) {
-    console.log('Google auth callback:', req);
     return req.user;
   }
 }

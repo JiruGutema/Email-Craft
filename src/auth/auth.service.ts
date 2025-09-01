@@ -10,7 +10,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
-  
+
   async validateUser(username: string, password: string) {
     const user = await this.usersService.findOne(username);
     if (user && user.password === password) {
@@ -37,6 +37,10 @@ export class AuthService {
   }
 
   async signup(signupUserDto: SignupUserDto) {
-    return this.usersService.create(signupUserDto);
+    const user = await this.usersService.create(signupUserDto);
+    if (!user) {
+      return { message: 'User with this email or username already exists' };
+    }
+    return { message: 'User created successfully', user };
   }
 }

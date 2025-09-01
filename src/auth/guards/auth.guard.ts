@@ -42,7 +42,6 @@ export class CanLogin implements CanActivate{
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const user = request.body;
-    console.log('CanLogin Guard - User:', user);
     if (user && user.password === "_google_oauth_user_") {
       throw new UnauthorizedException("Google OAuth users are not allowed. Try logging in with Google.");
     }

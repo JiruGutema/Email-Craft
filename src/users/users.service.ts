@@ -19,12 +19,12 @@ export class UsersService {
     });
 
     if (existingUser.length > 0) {
-      return {message: 'User with this email or username already exists'};
+      return null;
     }
     const createdUser = await Prisma.users.create({
       data: new_user,
     });
-    return {message: 'User created successfully', user: createdUser};
+    return createdUser;
   }
 
  async findAll() {
@@ -68,27 +68,10 @@ export class UsersService {
     });
     return { message: 'User deleted successfully' };
   }
-  async findOrCreateUser(profile: any) {
-    const { email, name, picture } = profile._json;
 
-    let user = await Prisma.users.findUnique({
+  async findOneByEmail(email: string) {
+    return await Prisma.users.findUnique({
       where: { email },
     });
-
-    if (!user) {
-      const username = email.split('@')[0];
-      const password = "_google_oauth_user_";
-      user = await Prisma.users.create({
-        data: {
-          email,
-          name,
-          password,
-          picture,
-          username,
-        },
-      });
-    }
-
-    return {user: {id: user.id, email: user.email, name: user.name, picture: user.picture}};
   }
 }
