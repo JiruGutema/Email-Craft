@@ -1,101 +1,42 @@
-# Mail Styler
+# Email Craft
 
-This project is a **NestJS** application that provides authentication and authorization using Google OAuth, and allows users to send html styled and custom emails directly from their Gmail account via a web interface. It uses **Prisma** for database management and supports both plain text and HTML emails.
+**Email Craft** is a full-stack web application built with **NestJS** (backend) and **NextJS** (frontend) for composing, styling, and sending custom HTML emails directly from your Gmail account. It features secure authentication via Google OAuth, robust JWT-based authorization, and a modern HTML email editor.
 
-## Features
+The backend uses **Prisma ORM** with PostgreSQL for efficient user and token management, and integrates with the Gmail API to send both plain text and HTML emails. Automatic token refresh ensures uninterrupted access, while custom guards protect sensitive operations.
 
-- **Google OAuth Authentication:** Users can log in with their Google account.
-- **JWT Authorization:** Secure API endpoints with JWT tokens.
-- **Send Email via Gmail API:** Authenticated users can send emails from their own Gmail account.
-- **Refresh Token Handling:** Automatically refreshes expired access tokens using the stored refresh token.
-- **Prisma ORM:** User and token management in a PostgreSQL database.
-- **HTML & Text Email Support:** Send rich HTML or plain text emails.
-- **Guards:** Custom guards for authentication and email sending permissions.
+The frontend provides a rich interface with live HTML editing, syntax highlighting, and preview capabilities. Drafts are automatically cached in the browser, allowing users to resume their work at any time.
 
-## Getting Started
+---
 
-### Prerequisites
+## ✨ Features
 
-- Node.js (v18+ recommended)
-- PostgreSQL database
-- Google Cloud OAuth credentials
+- **Google OAuth Authentication:** Secure login with your Google account.
+- **JWT Authorization:** Protects API endpoints with JWT tokens.
+- **Send Email via Gmail API:** Deliver emails from your own Gmail account.
+- **Automatic Token Refresh:** Handles expired access tokens using stored refresh tokens.
+- **Prisma ORM:** Manages users and tokens in a PostgreSQL database.
+- **Rich HTML & Text Email Support:** Compose and send beautiful HTML or plain text emails.
+- **Frontend Editor:** Live HTML editor with syntax highlighting and preview.
+- **Draft Saving:** Automatically cache your email drafts in the browser.
+- **Custom Guards:** Backend guards for authentication and email permissions.
 
-### Installation
+---
 
-1. **Clone the repository:**
-   ```sh
-   git clone https://github.com/jirugutema/Mail-Styler.git
-   cd Mail-Styler
-   ```
+## 🛠️ Technologies
 
-2. **Install dependencies:**
-   ```sh
-   npm install
-   ```
+- **NestJS** — Backend framework
+- **NextJS** — Frontend framework
+- **Prisma ORM** — Database management
+- **PostgreSQL** — Database
+- **Google OAuth & Gmail API** — Authentication and email delivery
+- **JWT** — Authorization
 
-3. **Configure environment variables:**
+---
 
-   Create a `.env` file in the project root:
+## 📝 License
 
-   ```
-   DATABASE_URL=postgresql://user:password@localhost:5432/dbname
-   JWT_SECRET=your_jwt_secret
-   GOOGLE_CLIENT_ID=your_google_client_id
-   GOOGLE_CLIENT_SECRET=your_google_client_secret
-   GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
-   ```
+MIT
 
-4. **Set up Prisma:**
-   ```sh
-   npx prisma migrate dev
-   npx prisma generate
-   ```
+---
 
-5. **Start the server:**
-   ```sh
-   npm run start:dev
-   ```
-
-## Usage
-
-### Authentication
-
-- Visit `/auth/google` to log in with your Google account.
-- After authentication, you will receive a JWT token for API access.
-
-### Sending Email
-
-- Send a POST request to `/mail/send` with your JWT token in the `Authorization` header.
-- Request body example (JSON):
-
-  ```json
-  {
-    "to": "recipient@example.com",
-    "subject": "Hello from NestJS!",
-    "text": "This is a plain text email.",
-    "html": "<h1>This is an HTML email!</h1><p>Sent from NestJS Gmail Web Mailer.</p>"
-  }
-  ```
-
-### Token Refresh
-
-- If your access token expires, the service will automatically refresh it using your stored Google refresh token.
-
-## Project Structure
-
-```
-src/
-  auth/         # Authentication logic, Google OAuth, JWT, guards
-  mail/         # Email sending logic, guards, controller, service
-  users/        # User management
-  prisma/       # Prisma schema
-  ...
-```
-
-## Troubleshooting
-
-- **No refresh token:** Make sure you use `accessType: 'offline'` and `prompt: 'consent'` in your Google OAuth strategy, and users revoke access before re-authenticating if needed.
-- **Insufficient scopes:** Add `'https://www.googleapis.com/auth/gmail.send'` to your OAuth scopes.
-- **Database errors:** Ensure your Prisma schema matches your code and run migrations.
-
-## License
+**Email Craft** makes it easy to send professional, styled emails from your Gmail account, with a secure and user-friendly interface for composing and managing your emails.
