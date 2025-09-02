@@ -8,7 +8,10 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class MailService {
-  async sendEmail(userId: string, body: { to: string, subject: string, text: string }) {
+  async sendEmail(
+    userId: string,
+    body: { to: string; subject: string; text?: string; html?: string }
+  ) {
     // Get tokens from DB
     const user = await prisma.users.findUnique({
       where: { id: userId },
@@ -27,12 +30,17 @@ export class MailService {
 
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-    const message = [
+    // Build the message with support for both text and html. Send a request with either a text or html field in the body.
+    // If html is provided, the email will be sent as HTML.
+    let message = [
       `To: ${body.to}`,
       `Subject: ${body.subject}`,
-      'Content-Type: text/plain; charset=utf-8',
+      'MIME-Version: 1.0',
+      body.html
+        ? 'Content-Type: text/html; charset=utf-8'
+        : 'Content-Type: text/plain; charset=utf-8',
       '',
-      body.text,
+      body.html ? body.html : body.text || '',
     ].join('\n');
 
     const encodedMessage = Buffer.from(message)
