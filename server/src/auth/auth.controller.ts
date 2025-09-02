@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req, Redirect } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, SignupUserDto } from './dto/create-auth.dto';
 import { AuthGuard, CanLogin } from './guards/auth.guard';
@@ -31,11 +31,13 @@ export class AuthController {
   async googleAuth() {}
 
 @UseGuards(GoogleAuthGuard)
- @Get('google/callback')
-  async googleAuthRedirect(@Request() req) {
-
-    const payload = { username: req.user.username, sub: req.user.id };
-    const token = await this.jwtService.signAsync(payload);
-    return { message: 'Google login successful', accessToken: token, user: req.user };
-  }
+@Get('google/callback')
+@Redirect('http://localhost:3001/login/success', 302)
+async googleAuthRedirect(@Request() req) {
+  const payload = { username: req.user.username, sub: req.user.id };
+  const token = await this.jwtService.signAsync(payload);
+  return {
+    url: `http://localhost:3001/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
+  };
+}
 }
