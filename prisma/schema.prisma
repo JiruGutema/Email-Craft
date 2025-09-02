@@ -19,5 +19,7 @@ model Users {
   name      String?
   password  String   @db.VarChar(255)
   picture   String?  @default("")
+  googleAccessToken String? @db.VarChar(255)
+  googleRefreshToken String? @db.VarChar(255)
   createdAt DateTime @default(now())
 }

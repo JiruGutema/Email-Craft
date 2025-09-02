@@ -9,10 +9,11 @@ import { AuthV2Controller } from './passport-auth.controller';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   controllers: [AuthController, AuthV2Controller],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy, AuthGuard],
   imports: [
     UsersModule,
     JwtModule.registerAsync({

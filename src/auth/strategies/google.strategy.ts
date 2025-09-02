@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-google-oauth20';
 import { UsersService } from 'src/users/users.service';
 import { ConfigService } from '@nestjs/config';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -14,9 +15,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
       callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
-      scope: ['email', 'profile'],
-    } as StrategyOptions); // <-- Explicitly cast as StrategyOptions
+      scope: ['email', 'profile','https://www.googleapis.com/auth/gmail.send'],
+      accessType: 'offline',
+      prompt: 'consent',    
+    } as StrategyOptions);
   }
+
   async validate(
     accessToken: string,
     refreshToken: string,
@@ -25,11 +29,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   ): Promise<any> {
     try {
       const { email, name, picture } = profile._json;
+      let baseUsername = email.split('@')[0];
+      let username = baseUsername;
+      let usernameExists = await this.userService.findOneByUsername(username);
+
+      // Alternative: Use crypto.randomBytes for unique suffix
+      if (usernameExists && usernameExists.email === email) {
+        do {
+          const suffix = randomBytes(3).toString('hex'); // 6 hex chars
+          username = `${baseUsername}_${suffix}`;
+          usernameExists = await this.userService.findOneByUsername(username);
+        } while (usernameExists);
+      }
 
       let user = await this.userService.findOneByEmail(email);
 
       if (!user) {
-        const username = email.split('@')[0];
         const password = '_google_oauth_user_';
         user = await this.userService.create({
           email,
@@ -38,19 +53,22 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           picture,
           username,
         });
-      }
+    }
+    console.log('google refresh token:', refreshToken);
+    if (user) {
+      await this.userService.updateGoogleTokens(user.id, accessToken, refreshToken);
+    }
 
       if (!user) {
         return { message: 'User registration failed' };
       }
 
       return {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          picture: user.picture,
-        },
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        picture: user.picture,
+        name: user.name,
       };
     } catch (error) {
       console.log('Error occurred while validating user', error);

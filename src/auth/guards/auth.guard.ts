@@ -16,16 +16,13 @@ export class AuthGuard implements CanActivate {
     if (!token) {
       throw new UnauthorizedException("No token provided");
     }
-    if(request.user.password === "_google_oauth_user_") {
-      throw new UnauthorizedException("Google OAuth users are not allowed. Try logging in with Google.");
-    }
     try {
         
         const tokenPayload = await this.jwtService.verifyAsync(token);
         request.user = {
           userId: tokenPayload.sub,
           username: tokenPayload.username,
-      };
+        };
       return true;
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

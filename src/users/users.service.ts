@@ -31,7 +31,7 @@ export class UsersService {
     return await Prisma.users.findMany();
   }
 
- async findOne(id: string) {
+ async findOneById(id: string) {
     const user = await Prisma.users.findUnique({
       where: { id },
     });
@@ -40,6 +40,19 @@ export class UsersService {
     }
     return user;
   }
+
+  async findOneByUsername(username: string) {
+    if (!username){
+      return null;
+    }
+      const user = await Prisma.users.findUnique({
+        where: { username },
+      });
+      if (!user) {
+        return null;
+      }
+      return user;
+    }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await Prisma.users.findUnique({
@@ -72,6 +85,19 @@ export class UsersService {
   async findOneByEmail(email: string) {
     return await Prisma.users.findUnique({
       where: { email },
+    });
+  }
+  async updateGoogleTokens(userId: string, accessToken: string, refreshToken: string) {
+
+    if (!userId || !accessToken) {
+      return null;
+    }
+    await Prisma.users.update({
+      where: { id: userId },
+      data: {
+        googleAccessToken: accessToken,
+        googleRefreshToken: refreshToken,
+      },
     });
   }
 }

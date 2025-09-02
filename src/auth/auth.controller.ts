@@ -3,10 +3,12 @@ import { AuthService } from './auth.service';
 import { CreateAuthDto, SignupUserDto } from './dto/create-auth.dto';
 import { AuthGuard, CanLogin } from './guards/auth.guard';
 import { GoogleAuthGuard } from './guards/google.guard';
+import { JwtService } from '@nestjs/jwt';
+import { userInfo } from 'os';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService, private readonly jwtService: JwtService) {}
 
   @UseGuards(CanLogin)
   @Post('login')
@@ -20,8 +22,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Get('me')
-  me(@Request() request) {
-    return this.authService.me(request.user.username);
+  async me(@Request() request) {
+    return await this.authService.me(request.user.username);
   }
 
   @UseGuards(GoogleAuthGuard)
@@ -30,7 +32,10 @@ export class AuthController {
 
 @UseGuards(GoogleAuthGuard)
  @Get('google/callback')
-  async googleAuthRedirect(@Req() req) {
-    return req.user;
+  async googleAuthRedirect(@Request() req) {
+
+    const payload = { username: req.user.username, sub: req.user.id };
+    const token = await this.jwtService.signAsync(payload);
+    return { message: 'Google login successful', accessToken: token, user: req.user };
   }
 }
