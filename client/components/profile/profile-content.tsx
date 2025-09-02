@@ -9,12 +9,16 @@ import Image from "next/image"
 import type { ProfileData } from "@/lib/types"
 
 export function ProfileContent() {
+
+  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
+
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState<ProfileData>({
-    name: "John Doe",
-    email: "john.doe@company.com",
-    bio: "Email marketing specialist with 5+ years of experience.",
-    company: "Acme Corp",
+    name: user?.name,
+    email:user.email, 
+    username: user?.username,
+    profile: user?.picture,
+    id: user?.id
   })
 
   const handleSave = () => {
@@ -24,8 +28,9 @@ export function ProfileContent() {
   }
 
   const handleLogout = () => {
-    // Handle logout logic
-    console.log("Logging out...")
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.href = "/login";
   }
 
   const handleDeleteAccount = () => {
@@ -43,7 +48,7 @@ export function ProfileContent() {
           <div className="flex items-center gap-4 mb-6">
             <div className="h-20 w-20 overflow-hidden rounded-full">
               <Image
-                src="/placeholder-user.png"
+                src={profileData?.profile || '/default-profile.png'}
                 alt="Profile Picture"
                 width={80}
                 height={80}
@@ -53,7 +58,7 @@ export function ProfileContent() {
             <div className="flex-1">
               <h3 className="text-xl font-semibold text-gray-900">{profileData.name}</h3>
               <p className="text-gray-600">{profileData.email}</p>
-              <p className="text-sm text-gray-500 mt-1">{profileData.company}</p>
+              <p className="text-sm text-gray-500 mt-1">{profileData.username}</p>
             </div>
             <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="gap-2">
               <Edit className="h-4 w-4" />
@@ -81,18 +86,11 @@ export function ProfileContent() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
                 <Input
-                  value={profileData.company}
-                  onChange={(e) => setProfileData({ ...profileData, company: e.target.value })}
+                  value={profileData.username}
+                  onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
-                <Textarea
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                  rows={3}
-                />
-              </div>
+    
               <div className="flex gap-2">
                 <Button onClick={handleSave}>Save Changes</Button>
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -102,7 +100,7 @@ export function ProfileContent() {
             </div>
           ) : (
             <div>
-              <p className="text-gray-700">{profileData.bio}</p>
+              {/* <p className="text-gray-700">{profileData.profile}</p> */}
             </div>
           )}
         </div>

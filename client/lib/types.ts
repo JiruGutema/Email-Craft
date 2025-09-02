@@ -9,7 +9,7 @@ export interface NavItemProps {
 export interface EmailData {
   to: string
   subject: string
-  htmlBody: string
+  html: string
 }
 
 export interface LoginData {
@@ -27,8 +27,9 @@ export interface SignupData {
 export interface ProfileData {
   name: string
   email: string
-  bio: string
-  company: string
+  username: string
+  profile: string
+  id: string
 }
 
 export type ViewType = "login" | "signup" | "composer" | "profile"

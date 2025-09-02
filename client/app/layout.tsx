@@ -5,9 +5,9 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Mail Styler',
-  description: 'A tool for styling your emails from html templates',
-  generator: 'Mail Styler',
+  title: 'EmailCraft',
+  description: 'Compose Stunning Emails Effortlessly',
+  generator: 'EmailCraft',
 }
 
 export default function RootLayout({

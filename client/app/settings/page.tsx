@@ -1,12 +1,11 @@
 'use client'
-import { ComposerSidebar } from "@/components/email/composer-sidebar"
 import { ComposerHeader } from "@/components/email/composer-header"
-import { ComposerForm } from "@/components/email/composer-form"
-import { useEffect, useState } from "react"
+import { ComposerSidebar } from "@/components/email/composer-sidebar"
 import { AuthGuard } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react"
 
-export default function ComposerPage() {
+export default function DraftPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
 
@@ -23,8 +22,7 @@ export default function ComposerPage() {
 			<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
 		</div>
   }
-
-  return (
+ return (
     <div className="flex h-screen bg-white">
       <ComposerSidebar />
 
@@ -36,7 +34,10 @@ export default function ComposerPage() {
         />
 
         <div className="p-6">
-          <ComposerForm />
+          <div className="border rounded-lg p-4">
+            <h2 className="text-lg font-bold mb-2">Settings</h2>
+            <p className="text-gray-600">This is the content of your settings page.</p>
+          </div>
         </div>
       </div>
     </div>

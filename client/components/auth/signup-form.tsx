@@ -1,58 +1,17 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import type { SignupData } from "@/lib/types"
 
-interface SignupFormProps {
-  onSignup: () => void
-  onSwitchToLogin: () => void
-}
-
-export function SignupForm({ onSignup, onSwitchToLogin }: SignupFormProps) {
-  const [signupData, setSignupData] = useState<SignupData>({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  })
+export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (signupData.password !== signupData.confirmPassword) {
-      alert("Passwords don't match")
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      // Simulate signup API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Signup attempt:", signupData)
-      onSignup()
-    } catch (error) {
-      console.error("Signup failed:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleGoogleSignup = async () => {
+  const handleGoogleSignup = () => {
     setIsLoading(true)
     try {
-      // Simulate Google OAuth
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Google signup")
-      onSignup()
+      window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/login`
     } catch (error) {
       console.error("Google signup failed:", error)
-    } finally {
       setIsLoading(false)
     }
   }
@@ -64,82 +23,12 @@ export function SignupForm({ onSignup, onSwitchToLogin }: SignupFormProps) {
         <p className="text-muted-foreground">Sign up for your email composer account</p>
       </div>
 
-      <form onSubmit={handleSignup} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
-            Full Name
-          </label>
-          <Input
-            id="name"
-            type="text"
-            placeholder="Enter your full name"
-            value={signupData.name}
-            onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-            Email Address
-          </label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="Enter your email"
-            value={signupData.email}
-            onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-            Password
-          </label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Create a password"
-            value={signupData.password}
-            onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-foreground mb-2">
-            Confirm Password
-          </label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm your password"
-            value={signupData.confirmPassword}
-            onChange={(e) => setSignupData({ ...signupData, confirmPassword: e.target.value })}
-            required
-            className="w-full"
-          />
-        </div>
-
-        <Button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-        >
-          {isLoading ? "Creating account..." : "Create Account"}
-        </Button>
-      </form>
-
       <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-border"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-card text-muted-foreground">Or continue with</span>
+          <span className="px-2 bg-card text-muted-foreground">continue with</span>
         </div>
       </div>
 
@@ -147,7 +36,7 @@ export function SignupForm({ onSignup, onSwitchToLogin }: SignupFormProps) {
         onClick={handleGoogleSignup}
         disabled={isLoading}
         variant="outline"
-        className="w-full bg-accent hover:bg-accent/90 text-accent-foreground border-accent"
+        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
       >
         <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
           <path
@@ -173,8 +62,10 @@ export function SignupForm({ onSignup, onSwitchToLogin }: SignupFormProps) {
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">
           Already have an account?{" "}
-          <button onClick={onSwitchToLogin} className="text-accent hover:text-accent/80 font-medium">
-            Sign in
+          <button onClick={() => {
+            window.location.href = "/login"
+          }} className="text-accent hover:text-accent/80 font-medium">
+            Login
           </button>
         </p>
       </div>

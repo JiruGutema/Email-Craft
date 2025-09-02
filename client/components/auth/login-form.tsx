@@ -6,48 +6,18 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { LoginData } from "@/lib/types"
-
-interface LoginFormProps {
-  onLogin: () => void
-  onSwitchToSignup: () => void
-}
-
-export function LoginForm({ onLogin, onSwitchToSignup }: LoginFormProps) {
-  const [loginData, setLoginData] = useState<LoginData>({
-    email: "",
-    password: "",
-  })
+export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      // Simulate login API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Login attempt:", loginData)
-      onLogin()
-    } catch (error) {
-      console.error("Login failed:", error)
-    } finally {
-      setIsLoading(false)
-    }
+const handleGoogleLogin = () => {
+  setIsLoading(true)
+  try {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/login`
+  } catch (error) {
+    console.error("Google login failed:", error)
+    setIsLoading(false)
   }
-
-  const handleGoogleLogin = async () => {
-    setIsLoading(true)
-    try {
-      // Simulate Google OAuth
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log("Google login")
-      onLogin()
-    } catch (error) {
-      console.error("Google login failed:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+}
 
   return (
     <div className="bg-card border rounded-lg shadow-sm p-8">
@@ -97,8 +67,10 @@ export function LoginForm({ onLogin, onSwitchToSignup }: LoginFormProps) {
       <div className="text-center mt-6">
         <p className="text-sm text-muted-foreground">
           Don't have an account?{" "}
-          <button onClick={onSwitchToSignup} className="text-accent hover:text-accent/80 font-medium">
-            Sign up
+          <button onClick={() => {
+            window.location.href = "/signup"
+          }} className="text-accent hover:text-accent/80 font-medium">
+            Sign Up
           </button>
         </p>
       </div>

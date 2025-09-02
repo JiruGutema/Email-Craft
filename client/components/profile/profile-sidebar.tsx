@@ -21,10 +21,10 @@ export function ProfileSidebar({ onBack }: ProfileSidebarProps) {
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Composer</span>
         </button>
-        <NavItem href="#" icon={<User className="h-4 w-4" />} active>
+        <NavItem href="/profile" icon={<User className="h-4 w-4" />} active>
           Profile
         </NavItem>
-        <NavItem href="#" icon={<Settings className="h-4 w-4" />}>
+        <NavItem href="/settings" icon={<Settings className="h-4 w-4" />}>
           Settings
         </NavItem>
       </nav>

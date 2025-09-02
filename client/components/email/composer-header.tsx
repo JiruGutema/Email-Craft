@@ -8,8 +8,8 @@ interface ComposerHeaderProps {
   onProfileClick: () => void
   onBack?: () => void
 }
-
 export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) {
+  const user  = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
   return (
     <header className="flex items-center justify-between border-b px-6 py-4">
       <div className="flex items-center gap-4">
@@ -29,7 +29,7 @@ export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) 
           className="h-8 w-8 overflow-hidden rounded-full hover:ring-2 hover:ring-gray-200 transition-all"
         >
           <Image
-            src="/placeholder-user.png"
+            src={user?.picture || "/default-profile.png"}
             alt="Avatar"
             width={32}
             height={32}

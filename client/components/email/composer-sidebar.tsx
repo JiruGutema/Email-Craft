@@ -1,7 +1,10 @@
-import { Send } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { HelpCircle, Home, Send } from "lucide-react"
 import { NavItem } from "@/components/nav-item"
 
 export function ComposerSidebar() {
+  const pathname = usePathname()
+
   return (
     <div className="w-64 border-r bg-white flex flex-col">
       <div className="p-4">
@@ -9,11 +12,22 @@ export function ComposerSidebar() {
       </div>
 
       <nav className="space-y-1 px-2 flex-1">
-        <NavItem href="#" icon={<Send className="h-4 w-4" />} active>
+        <NavItem
+          href="/"
+          icon={<Home className="h-4 w-4" />}
+          active={pathname === "/"}
+        >
+          Home
+        </NavItem>
+        <NavItem
+          href="/composer"
+          icon={<Send className="h-4 w-4" />}
+          active={pathname === "/composer"}
+        >
           Compose
         </NavItem>
         <NavItem
-          href="#"
+          href="/drafts"
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path
@@ -25,19 +39,29 @@ export function ComposerSidebar() {
               <polyline points="22,6 12,13 2,6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           }
+          active={pathname === "/drafts"}
         >
           Drafts
         </NavItem>
         <NavItem
-          href="#"
+          href="/sent"
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           }
+          active={pathname === "/sent"}
         >
           Sent
         </NavItem>
+        <NavItem
+          href="/help"
+          icon={<HelpCircle className="h-4 w-4" />}
+          active={pathname === "/help"}
+        >
+          Help
+        </NavItem>
+
         <div className="py-3">
           <div className="px-3 text-xs font-medium uppercase text-gray-500">Templates</div>
           <div className="mt-2">

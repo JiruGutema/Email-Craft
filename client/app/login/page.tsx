@@ -5,14 +5,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <LoginForm
-          onLogin={() => {
-            // Handle login redirect
-            window.location.href = "/composer"
-          }}
-          onSwitchToSignup={() => {
-            // Handle switch to signup
-            window.location.href = "/signup"
-          }}
+          
         />
       </div>
     </div>
