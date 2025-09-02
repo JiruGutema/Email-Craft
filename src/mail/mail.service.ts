@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
 export class MailService {
   async sendEmail(
     userId: string,
-    body: { to: string; subject: string; text?: string; html?: string }
+    body: CreateMailDto
   ) {
     // Get tokens from DB
     const user = await prisma.users.findUnique({

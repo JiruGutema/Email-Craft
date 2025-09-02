@@ -11,7 +11,7 @@ export class MailController {
 
   @UseGuards(AuthGuard, SendEmailGuard)
   @Post('send')
-  async sendEmail(@Request() req, @Body() body: { to: string, subject: string, text: string }) {
+  async sendEmail(@Request() req, @Body() body: CreateMailDto) {
     return this.mailService.sendEmail(req.user.userId, body);
   }
 
