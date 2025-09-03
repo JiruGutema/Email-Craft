@@ -5,6 +5,7 @@ import { ComposerForm } from "@/components/email/composer-form"
 import { useEffect, useState } from "react"
 import { AuthGuard } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import Spinner from "@/components/spinner"
 
 export default function ComposerPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -19,9 +20,9 @@ export default function ComposerPage() {
   }, [router])
 
   if (!isAuthenticated) {
-    return <div className="mb-6 flex items-center justify-center">
-			<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-		</div>
+    return (
+      <Spinner />
+    )
   }
 
   return (

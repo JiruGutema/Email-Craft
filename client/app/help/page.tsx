@@ -26,6 +26,7 @@ import { ComposerSidebar } from "@/components/email/composer-sidebar"
 import { ComposerHeader } from "@/components/email/composer-header"
 import { useRouter } from "next/navigation"
 import { AuthGuard } from "@/lib/utils"
+import Spinner from "@/components/spinner"
 
 export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -42,9 +43,7 @@ export default function HelpPage() {
   }, [router])
 
   if (!isAuthenticated) {
-    return <div className="mb-6 flex items-center justify-center">
-			<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-		</div>
+    return <Spinner /> 
   }
   const helpSections = [
     {

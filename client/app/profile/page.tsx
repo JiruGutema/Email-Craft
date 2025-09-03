@@ -5,6 +5,7 @@ import { ProfileContent } from "@/components/profile/profile-content"
 import { AuthGuard } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import Spinner from "@/components/spinner"
 
 export default function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -19,9 +20,9 @@ export default function ProfilePage() {
   }, [router])
 
   if (!isAuthenticated) {
-    return <div className="mb-6 flex items-center justify-center">
-			<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-		</div>
+    return (
+    <Spinner /> 
+    )
   }
   return (
     <div className="flex h-screen bg-white">

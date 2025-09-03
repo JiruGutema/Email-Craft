@@ -1,11 +1,14 @@
 'use client'
+import DraftsPage from "@/components/draft/drafts"
+import { ComposerForm } from "@/components/email/composer-form"
 import { ComposerHeader } from "@/components/email/composer-header"
 import { ComposerSidebar } from "@/components/email/composer-sidebar"
+import Spinner from "@/components/spinner"
 import { AuthGuard } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 
-export default function DraftPage() {
+export default function Draft() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const router = useRouter()
 
@@ -18,11 +21,10 @@ export default function DraftPage() {
   }, [router])
 
   if (!isAuthenticated) {
-    return <div className="mb-6 flex items-center justify-center">
-			<div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-		</div>
+    return <Spinner />
   }
- return (
+
+    return (
     <div className="flex h-screen bg-white">
       <ComposerSidebar />
 
@@ -34,10 +36,7 @@ export default function DraftPage() {
         />
 
         <div className="p-6">
-          <div className="border rounded-lg p-4">
-            <h2 className="text-lg font-bold mb-2">Draft Title</h2>
-            <p className="text-gray-600">This is the content of your draft email.</p>
-          </div>
+          <DraftsPage />
         </div>
       </div>
     </div>

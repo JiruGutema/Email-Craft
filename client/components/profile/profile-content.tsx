@@ -4,40 +4,110 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Edit, LogOut, Trash2 } from "lucide-react"
+import { Edit, LogOut, LogOutIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
 import type { ProfileData } from "@/lib/types"
+import { useEffect } from "react"
+import { toast } from "sonner"
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { getToken, HandleLogout } from "@/lib/utils"
+import { deleteMe, getUserProfile } from "@/lib/user"
 
 export function ProfileContent() {
 
-  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
 
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState<ProfileData>({
-    name: user?.name,
-    email:user.email, 
-    username: user?.username,
-    profile: user?.picture,
-    id: user?.id
+    name: "",
+    email: "",
+    username: "",
+    profile: "",
+    id: ""
   })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUserProfile(getToken() || "");
+
+        if(res.status === 401){
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }
+        if (!res.ok) {
+          console.error("Failed to fetch user:", res.status, res.statusText);
+          return;
+        }
+        const user = await res.json();
+        setProfileData({
+          name: user?.name ?? user?.username ?? "",
+          email: user?.email || "",
+          username: user?.username || "",
+          profile: user?.picture || "",
+          id: user?.id || ""
+        });
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false)
-    // Here you would typically save to your backend
     console.log("Profile saved:", profileData)
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    window.location.href = "/login";
-  }
 
-  const handleDeleteAccount = () => {
-    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      // Handle account deletion
-      console.log("Deleting account...")
+  // Delete Account Dialog State
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+    try {
+      const res = await deleteMe(getToken() || '');
+      if (res.status === 401 || res.status === 403 || res.status === 404) {
+        localStorage.removeItem("user")
+        localStorage.removeItem("token")
+        toast.error("Session expired. Please log in again.")
+        setTimeout(() => {
+          window.location.href = "/"
+        }, 3000);
+        return
+      }
+      if (!res.ok) {
+        console.error("Failed to delete account:", res.status, res.statusText)
+        toast.error("Failed to delete account. Please try again.")
+        setIsDeleting(false)
+        return
+      }
+
+      // Success: log out and redirect
+      localStorage.removeItem("user")
+      localStorage.removeItem("token")
+      toast.success("Account deleted successfully.")
+      setTimeout(() => {
+        window.location.href = "/"
+      }, 3000);
+    } catch (error) {
+      console.error("Error deleting account:", error)
+      toast.error("An error occurred. Please try again.")
+      setIsDeleting(false)
     }
+    setShowDeleteDialog(false)
   }
 
   return (
@@ -128,18 +198,72 @@ export function ProfileContent() {
         <div className="bg-white border rounded-lg p-6">
           <h4 className="font-semibold text-gray-900 mb-4">Account Actions</h4>
           <div className="flex flex-row justify-between">
-            <Button variant="outline" onClick={handleLogout} className="min-w-60  border-black justify-start gap-2 bg-transparent">
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDeleteAccount}
-              className="w-60 justify-start mt-0 text-red-600 border-red-500 hover:bg-red-500 bg-transparent"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Account
-            </Button>
+            <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-60 justify-start mt-0 text-black border-red-500 hover:bg-primary bg-transparent"
+                >
+                  <LogOutIcon className="h-4 w-4" />
+                  Logout
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to log out?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline" disabled={isLoggingOut}>
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    variant="destructive"
+                    onClick={HandleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? "Logging out..." : "Yes, log me out"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-60 justify-start mt-0 text-red-600 border-red-500 hover:bg-red-500 bg-transparent"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete Account
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogDescription>
+                    This action cannot be undone. This will permanently delete your account and all associated data.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline" disabled={isDeleting}>
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Yes, delete my account"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

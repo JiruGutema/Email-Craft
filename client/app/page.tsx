@@ -2,14 +2,20 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { toast } from "@/hooks/use-toast"
+import { subscribe } from "@/lib/subscribe"
 import { AuthGuard } from "@/lib/utils"
+import { Description } from "@radix-ui/react-toast"
 import { Mail, Edit3, User, Shield, Star, ArrowRight, Check } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
+
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [email, setEmail] = useState("");
+
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = AuthGuard();
@@ -20,6 +26,23 @@ export default function Home() {
     checkAuth();
   }, []);
 
+  const handleSubscription = async (email: string) => {
+    // validate for email first check it's validity format and so on
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast({ title: "error", description: "Please enter a valid email address.", variant: "destructive" });
+      return;
+    }
+
+    let res = (await subscribe(email));
+
+    if(res.ok){
+      toast({ title: "success", description: "You have been subscribed successfully. Thank you!", variant: "default" });
+    }
+    else{
+      toast({ title: "error", description: "Something went wrong. Please try again later.", variant: "destructive" });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -27,7 +50,8 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
-              <Mail className="h-8 w-8 text-accent" />
+              <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
+              
               <span className="text-xl font-semibold text-foreground">EmailCraft</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
@@ -241,8 +265,14 @@ export default function Home() {
               Get the latest updates, tips, and best practices delivered to your inbox.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input type="email" placeholder="Enter your email" className="flex-1" />
-              <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">Subscribe</Button>
+              <Input
+                onChange={e => setEmail(e.target.value)}
+                type="email"
+                placeholder="Enter your email"
+                className="flex-1"
+                value={email}
+              />
+              <Button onClick={() => handleSubscription(email)} className="bg-accent hover:bg-accent/90 text-accent-foreground">Subscribe</Button>
             </div>
           </div>
         </div>
@@ -254,8 +284,8 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Mail className="h-6 w-6 text-accent" />
-                <span className="text-lg font-semibold">EmailCraft</span>
+                 <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
+                <Link href={""} onClick={()=>{window.location.href="/"}}><span className="text-lg font-semibold">EmailCraft</span></Link>
               </div>
               <p className="text-muted-foreground text-sm">Professional email composition made simple and beautiful.</p>
             </div>

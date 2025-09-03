@@ -1,14 +1,9 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/spinner";
 
-function Spinner() {
-  return (
-    <div className="mb-6 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-    </div>
-  );
-}
+
 
 export default function LoginSuccess() {
   const router = useRouter();
@@ -17,9 +12,18 @@ export default function LoginSuccess() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
     const user = params.get("user");
+    const idx_cache = localStorage.getItem("idx_cache");
+
+    if (
+      user &&
+      String(idx_cache) !== String(JSON.parse(user).id)
+    ) {
+      localStorage.removeItem("composerFormCache");
+    }
+    
     if (user) {
       localStorage.setItem("user", user);
-      console.log(user);
+      localStorage.setItem("idx_cache", JSON.parse(user).id);
     }
     if (token) {
       localStorage.setItem("token", token);

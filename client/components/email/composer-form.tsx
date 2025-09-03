@@ -10,13 +10,14 @@ import Editor from "react-simple-code-editor";
 import Prism from "prismjs";
 import "prismjs/themes/prism.css";
 import "prismjs/components/prism-markup"; // For HTML highlighting
+import { sendEmail } from "@/lib/email";
+import { getToken } from "@/lib/utils";
+import { saveDraft } from "@/lib/drafts";
+import { toast } from "@/hooks/use-toast";
 
 export function ComposerForm() {
-  const [emailData, setEmailData] = useState<EmailData>({
-    to: "",
-    subject: "",
-    html: "",
-  });
+  const defaultEmailData: EmailData = { to: "", subject: "", body: "" };
+  const [emailData, setEmailData] = useState<EmailData>(defaultEmailData);
   const [activeTab, setActiveTab] = useState("compose");
   const [isSending, setIsSending] = useState(false);
 
@@ -25,36 +26,43 @@ export function ComposerForm() {
     const cached = localStorage.getItem("composerFormCache");
     if (cached) {
       try {
-        setEmailData(JSON.parse(cached));
-      } catch {}
+        const parsed = JSON.parse(cached);
+        setEmailData({ ...defaultEmailData, ...parsed });
+      } catch {
+        setEmailData(defaultEmailData);
+      }
+    } else {
+      setEmailData(defaultEmailData);
     }
   }, []);
-
-  // Cache form data on change
+  {
+    toast;
+  }
+  // Cache form data on change, but only if not empty
   useEffect(() => {
-    localStorage.setItem("composerFormCache", JSON.stringify(emailData));
+    // Only cache if at least one field is non-empty
+    if (emailData.to || emailData.subject || emailData.body) {
+      localStorage.setItem("composerFormCache", JSON.stringify(emailData));
+    }
   }, [emailData]);
 
   const handleSendEmail = async () => {
     setIsSending(true);
     try {
-      const token =
-        typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/mail/send`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify(emailData),
-        }
-      );
+      const response = await sendEmail(emailData, getToken() || "");
+      if (response.status === 401) {
+        toast({
+          title: "Login Success",
+          description: "Unauthorized access. Please log in.",
+        });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
 
       if (response.ok) {
         console.log("Email sent successfully");
-        setEmailData({ to: "", subject: "", html: "" });
+        setEmailData(defaultEmailData);
         localStorage.removeItem("composerFormCache"); // Clear cache on success
       } else {
         console.error("Failed to send email");
@@ -63,6 +71,32 @@ export function ComposerForm() {
       console.error("Error sending email:", error);
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (emailData.to || emailData.subject || emailData.body) {
+      try {
+        const response = await saveDraft(emailData, getToken() || "");
+        if (response.status === 401) {
+          toast({
+            title: "Login Success",
+            description: "Unauthorized access. Please log in.",
+          });
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+        } else if (response.ok) {
+          console.log(await response.json());
+          toast({ title: "", description: "Draft saved successfully" });
+        } else {
+          toast({ title: "Error", description: "Failed to save draft" });
+        }
+      } catch (error) {
+        console.error("Error saving draft:", error);
+      }
+    } else {
+      toast({ title: "", description: "No changes to save" });
     }
   };
 
@@ -84,7 +118,7 @@ export function ComposerForm() {
               placeholder="recipient@example.com"
               value={emailData.to}
               onChange={(e) =>
-                setEmailData({ ...emailData, to: e.target.value })
+                setEmailData((prev) => ({ ...prev, to: e.target.value }))
               }
               className="w-1/2 text-black"
             />
@@ -102,7 +136,7 @@ export function ComposerForm() {
               placeholder="Enter email subject"
               value={emailData.subject}
               onChange={(e) =>
-                setEmailData({ ...emailData, subject: e.target.value })
+                setEmailData((prev) => ({ ...prev, subject: e.target.value }))
               }
               className="w-1/2"
             />
@@ -125,25 +159,25 @@ export function ComposerForm() {
                 Preview
               </TabsTrigger>
             </TabsList>
-              <Button
-                type="button"
-                // variant="outline"
-                size="sm"
-                className="ml-4"
-                onClick={async () => {
-                  if (navigator.clipboard) {
-                    const text = await navigator.clipboard.readText();
-                    setEmailData((prev) => ({ ...prev, html: text }));
-                  }
-                }}
-              >
-                <ClipboardPaste className="h-8 w-8" />
-              </Button>
+            <Button
+              type="button"
+              // variant="outline"
+              size="sm"
+              className="ml-4"
+              onClick={async () => {
+                if (navigator.clipboard) {
+                  const text = await navigator.clipboard.readText();
+                  setEmailData((prev) => ({ ...prev, html: text }));
+                }
+              }}
+            >
+              <ClipboardPaste className="h-8 w-8" />
+            </Button>
             <TabsContent value="compose" className="mt-4">
               <Editor
-                value={emailData.html}
+                value={emailData.body}
                 onValueChange={(code) =>
-                  setEmailData({ ...emailData, html: code })
+                  setEmailData((prev) => ({ ...prev, body: code }))
                 }
                 highlight={(code) =>
                   Prism.highlight(code, Prism.languages.markup, "markup")
@@ -170,7 +204,7 @@ export function ComposerForm() {
                   <div
                     dangerouslySetInnerHTML={{
                       __html:
-                        emailData.html ||
+                        emailData.body ||
                         '<p class="text-gray-500">No content to preview</p>',
                     }}
                   />
@@ -184,7 +218,7 @@ export function ComposerForm() {
         <div className="flex items-center justify-between pt-6 border-t">
           <div className="flex items-center gap-2">
             <Button
-             /*  variant="outline" */
+              /*  variant="outline" */
               size="sm"
               className=""
             >
@@ -193,7 +227,7 @@ export function ComposerForm() {
             </Button>
           </div>
           <div className="flex items-center gap-2">
-            <Button /* variant="outline" */>Save Draft</Button>
+            <Button onClick={handleSaveDraft}>Save Draft</Button>
             <Button
               onClick={handleSendEmail}
               disabled={isSending || !emailData.to || !emailData.subject}

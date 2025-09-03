@@ -1,18 +1,16 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import type { LoginData } from "@/lib/types"
+import { ApiBaseUrl } from "@/lib/utils"
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
 
 const handleGoogleLogin = () => {
   setIsLoading(true)
   try {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/login`
+    window.location.href = `${ApiBaseUrl()}/auth/google/login`
   } catch (error) {
     console.error("Google login failed:", error)
     setIsLoading(false)
