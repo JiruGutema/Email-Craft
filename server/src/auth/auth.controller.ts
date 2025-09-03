@@ -63,7 +63,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Delete('delete')
   async delete(@Request() req) {
-    console.log('request user:', req.user);
     return await this.authService.delete(req.user.userId);
   }
 
