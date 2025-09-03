@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateAuthDto, SignupUserDto } from './dto/create-auth.dto';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateAuthDto, SignupUserDto } from './dto/auth.dto';
 import { UsersService } from 'src/users/users.service';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Sign } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +13,7 @@ export class AuthService {
 
   async validateUser(username: string, password: string) {
     const user = await this.usersService.findOneByUsername(username);
-    if (user && user.password === password) {
+    if (user && await bcrypt.compare(password, user.password)) {
       return user;
     }
     return null;
@@ -22,6 +22,8 @@ export class AuthService {
   async login(createAuthDto: CreateAuthDto) {
     const { username, password } = createAuthDto;
     const user = await this.validateUser(username, password);
+  
+
 
     if (!user) {
       return { message: 'Invalid username or password' };
@@ -29,7 +31,7 @@ export class AuthService {
 
     const payload = { username: user.username, sub: user.id };
     const token = await this.jwtService.signAsync(payload);
-    return { message: 'logged in successfully', accessToken: token, user };
+    return { message: 'logged in successfully', accessToken: token, user: { id: user.id, username: user.username, email: user.email, name: user.name, picture: user.picture } };
   }
 
   async me(username: string) {
@@ -38,7 +40,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
       return;
     }
-    return { user };
+    return { id: user.id, username: user.username, email: user.email, name: user.name, picture: user.picture };
   }
 
   async signup(signupUserDto: SignupUserDto) {
@@ -46,6 +48,14 @@ export class AuthService {
     if (!user) {
       return { message: 'User with this email or username already exists' };
     }
-    return { message: 'User created successfully', user };
+    return { message: 'User created successfully', user: { id: user.id, username: user.username, email: user.email, name: user.name, picture: user.picture } };
+  }
+
+  async delete(userId: string) {
+    const deletedUser =  await this.usersService.delete(userId);
+    if (!deletedUser) {
+      throw new NotFoundException('User not found');
+    }
+    return { message: 'User deleted successfully' };
   }
 }

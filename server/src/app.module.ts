@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
+import { SubscriptionModule } from './subscription/subscription.module';
+import { DraftsModule } from './drafts/drafts.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { MailModule } from './mail/mail.module';
       isGlobal: true,
     }),
     MailModule,
+    SubscriptionModule,
+    DraftsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

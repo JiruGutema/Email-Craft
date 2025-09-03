@@ -22,4 +22,25 @@ model Users {
   googleAccessToken String? @db.VarChar(255)
   googleRefreshToken String? @db.VarChar(255)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  drafts    Drafts[]
+}
+
+model Subscription {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model Drafts {
+  id        String   @id @default(uuid())
+  userId    String
+  to        String
+  subject   String
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
