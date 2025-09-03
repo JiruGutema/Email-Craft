@@ -29,17 +29,17 @@ export default function Home() {
   const handleSubscription = async (email: string) => {
     // validate for email first check it's validity format and so on
     if (!/\S+@\S+\.\S+/.test(email)) {
-      toast({ title: "error", description: "Please enter a valid email address.", variant: "destructive" });
+      toast({ description: "Please enter a valid email address.", variant: "destructive" });
       return;
     }
 
     let res = (await subscribe(email));
 
     if(res.ok){
-      toast({ title: "success", description: "You have been subscribed successfully. Thank you!", variant: "default" });
+      toast({ description: "You have been subscribed successfully. Thank you!", variant: "default" });
     }
     else{
-      toast({ title: "error", description: "Something went wrong. Please try again later.", variant: "destructive" });
+      toast({ description: "Something went wrong. Please try again later.", variant: "destructive" });
     }
   };
 

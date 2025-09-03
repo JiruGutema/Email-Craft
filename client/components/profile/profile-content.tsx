@@ -8,7 +8,6 @@ import { Edit, LogOut, LogOutIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
 import type { ProfileData } from "@/lib/types"
 import { useEffect } from "react"
-import { toast } from "sonner"
 import {
   Dialog,
   DialogTrigger,
@@ -21,6 +20,9 @@ import {
 } from "@/components/ui/dialog"
 import { getToken, HandleLogout } from "@/lib/utils"
 import { deleteMe, getUserProfile } from "@/lib/user"
+import { set } from "react-hook-form"
+import { toast } from "../ui/use-toast"
+import { Description } from "@radix-ui/react-toast"
 
 export function ProfileContent() {
 
@@ -42,10 +44,14 @@ export function ProfileContent() {
         if(res.status === 401){
           localStorage.removeItem("user");
           localStorage.removeItem("token");
-          window.location.href = "/login";
+          toast({ description: "Session expired. Please log in again.", variant: "destructive" });
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
         }
         if (!res.ok) {
           console.error("Failed to fetch user:", res.status, res.statusText);
+          toast({ description: "Failed to fetch user data. Please try again later.", variant: "destructive" });
           return;
         }
         const user = await res.json();
@@ -79,32 +85,58 @@ export function ProfileContent() {
     setIsDeleting(true)
     try {
       const res = await deleteMe(getToken() || '');
-      if (res.status === 401 || res.status === 403 || res.status === 404) {
-        localStorage.removeItem("user")
-        localStorage.removeItem("token")
-        toast.error("Session expired. Please log in again.")
+      console.log(await res.json());
+      if(res.ok){
+            localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        toast({ description: "User account deleted successfully.", variant: "default" });
         setTimeout(() => {
-          window.location.href = "/"
-        }, 3000);
-        return
+          window.location.href = "/";
+        }, 3000); 
       }
+      if(res.status === 401){
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        toast({ description: "Session expired. Please log in again.", variant: "destructive" });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
+      if(res.status === 403){
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        toast({ description: "Session expired. Please log in again.", variant: "destructive" });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
+      if (res.status === 404) {
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        toast({ description: "Session expired. Please log in again.", variant: "destructive" });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
+      
       if (!res.ok) {
         console.error("Failed to delete account:", res.status, res.statusText)
-        toast.error("Failed to delete account. Please try again.")
+        toast({ description: "Failed to delete account. Please try again.", variant: "destructive" })
         setIsDeleting(false)
         return
       }
 
+
       // Success: log out and redirect
       localStorage.removeItem("user")
       localStorage.removeItem("token")
-      toast.success("Account deleted successfully.")
+      toast({ description: "Account deleted successfully.", variant: "default" })
       setTimeout(() => {
         window.location.href = "/"
       }, 3000);
     } catch (error) {
       console.error("Error deleting account:", error)
-      toast.error("An error occurred. Please try again.")
+      toast({ description: "An error occurred. Please try again.", variant: "destructive" })
       setIsDeleting(false)
     }
     setShowDeleteDialog(false)

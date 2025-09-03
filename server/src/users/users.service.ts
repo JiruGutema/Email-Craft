@@ -73,15 +73,15 @@ export class UsersService {
     return { message: 'User updated successfully', user: { id: updatedUser.id, username: updatedUser.username, email: updatedUser.email, name: updatedUser.name, picture: updatedUser.picture } };
   }
 
-  async delete(id: string) {
+  async delete(userId: string) {
     const user = await Prisma.users.findUnique({
-      where: { id },
+      where: { id: userId },
     });
     if (!user) {
-      return { message: `User with id ${id} not found` };
+      return { message: `User with id ${userId} not found` };
     }
     await Prisma.users.delete({
-      where: { id },
+      where: { id: userId },
     });
     return { message: 'User deleted successfully' };
   }

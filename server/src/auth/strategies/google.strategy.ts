@@ -54,7 +54,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           username,
         });
     }
-    console.log('google refresh token:', refreshToken);
     if (user) {
       await this.userService.updateGoogleTokens(user.id, accessToken, refreshToken);
     }
