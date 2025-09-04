@@ -36,7 +36,8 @@ export default function Home() {
     let res = (await subscribe(email));
 
     if(res.ok){
-      toast({ description: "You have been subscribed successfully. Thank you!", variant: "default" });
+      const data = await res.json();
+      toast({ description: data.message, variant: "default" });
     }
     else{
       toast({ description: "Something went wrong. Please try again later.", variant: "destructive" });
@@ -81,12 +82,12 @@ export default function Home() {
               ) : (
               <>
                 <Link href="/login">
-                <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" className=" bg-accent hover:bg-accent/70 text-accent-foreground">
                   Login
                 </Button>
                 </Link>
                 <Link href="/login">
-                <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">Sign Up</Button>
+                <Button className="bg-accent hover:bg-accent/70 text-accent-foreground">Sign Up</Button>
                 </Link>
               </>
               )}

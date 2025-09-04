@@ -3,8 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
   Delete,
   UseGuards,
   Request,
@@ -16,7 +14,6 @@ import { CreateAuthDto, SignupUserDto } from './dto/auth.dto';
 import { AuthGuard, CanLogin } from './guards/auth.guard';
 import { GoogleAuthGuard } from './guards/google.guard';
 import { JwtService } from '@nestjs/jwt';
-import { userInfo } from 'os';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @Controller('auth')

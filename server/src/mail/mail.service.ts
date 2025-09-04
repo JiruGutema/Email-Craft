@@ -16,7 +16,7 @@ export class MailService {
     const user = await prisma.users.findUnique({
       where: { id: userId },
       select: { googleAccessToken: true, googleRefreshToken: true },
-    });
+    }); 
 
     if (!user?.googleAccessToken) {
       throw new UnauthorizedException('Google access token not found. Please log in with Google.');
@@ -36,11 +36,11 @@ export class MailService {
       `To: ${body.to}`,
       `Subject: ${body.subject}`,
       'MIME-Version: 1.0',
-      body.html
+      body.body
         ? 'Content-Type: text/html; charset=utf-8'
         : 'Content-Type: text/plain; charset=utf-8',
       '',
-      body.html ? body.html : body.text || '',
+      body.body ? body.body : body.text || '',
     ].join('\n');
 
     const encodedMessage = Buffer.from(message)

@@ -8,10 +8,19 @@ const prisma = new PrismaClient();
 @Injectable()
 export class DraftsService {
   async create(createDraftDto: CreateDraftDto, userId: string) {
+    const  subject = createDraftDto.subject;
+    const to = createDraftDto.to;
+
     const user = await prisma.users.findUnique({ where: { id: userId } });
+    const draft_Exist = await prisma.drafts.findFirst({ where: { subject, to } });
     if (!user) {
       throw new UnauthorizedException(`User with id ${userId} not found`);
     }
+
+    if (draft_Exist) {
+      throw new ForbiddenException(`Draft with subject "${subject}" and to "${to}" already exists`);
+    }
+
     const draft = await prisma.drafts.create({
       data: { ...createDraftDto, userId },
     });
@@ -22,7 +31,7 @@ export class DraftsService {
     }
   }
 
-  async findAll() {
+  async findAll() { //! Add Pagination to this page
     const res = await prisma.drafts.findMany();
     if (res) {
       return res;

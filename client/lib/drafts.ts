@@ -30,3 +30,10 @@ export async function updateDraft(id: string, body: DraftData, token: string) {
     token: token,
   });
 }
+
+export async function getDraft(id: string, token: string) {
+  return apiFetch(`/drafts/${id}`, {
+    method: "GET",
+    token: token,
+  });
+}

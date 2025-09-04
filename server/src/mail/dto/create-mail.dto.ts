@@ -8,5 +8,5 @@ export class CreateMailDto {
     @ApiProperty({ example: 'this is a test email from Mail Craft (try to write your message with styled html and css) ' })
     text?: string;
     @ApiProperty({ example: '<h1>This is a test email from Mail Craft</h1>' })
-    html?: string;
+    body?: string;
 }

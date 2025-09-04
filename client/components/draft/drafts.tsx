@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getDrafts } from "@/lib/drafts";
+import { getToken } from "@/lib/utils";
+import { set } from "react-hook-form";
 
 interface Draft {
   id: string;
@@ -32,44 +35,23 @@ interface Draft {
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"date" | "subject" | "recipient">("date");
-  const [filterBy, setFilterBy] = useState<"all" | "high" | "medium" | "low">("all");
+  const [sortBy, setSortBy] = useState<"date" | "subject" | "recipient">(
+    "date"
+  );
+  const [filterBy, setFilterBy] = useState<"all" | "high" | "medium" | "low">(
+    "all"
+  );
 
   // Mock draft data
-  const [drafts, setDrafts] = useState<Draft[]>([
-    {
-      id: "1",
-      to: "john.doe@example.com",
-      subject: "Project Update - Q4 Review",
-      body: "<p>Hi John,</p><p>I wanted to provide you with an update on our Q4 project progress. We have successfully completed the initial phase and are now moving into the implementation stage...</p>",
-      createdAt: new Date("2024-01-15T10:30:00"),
-      lastModified: new Date("2024-01-15T14:45:00"),
-    },
-    {
-      id: "2",
-      to: "marketing@company.com",
-      subject: "New Campaign Proposal",
-      body: "<p>Dear Marketing Team,</p><p>I have prepared a comprehensive proposal for our upcoming spring campaign. The strategy focuses on digital engagement and customer retention...</p>",
-      createdAt: new Date("2024-01-14T09:15:00"),
-      lastModified: new Date("2024-01-14T16:20:00"),
-    },
-    {
-      id: "3",
-      to: "sarah.wilson@client.com",
-      subject: "Meeting Follow-up",
-      body: "<p>Hi Sarah,</p><p>Thank you for taking the time to meet with us yesterday. As discussed, I am attaching the documents we reviewed and the next steps for our collaboration...</p>",
-      createdAt: new Date("2024-01-13T11:00:00"),
-      lastModified: new Date("2024-01-13T11:30:00"),
-    },
-    {
-      id: "4",
-      to: "team@startup.com",
-      subject: "Weekly Team Sync",
-      body: "<p>Hello Team,</p><p>Here are the key points from this week and our agenda for the upcoming team sync meeting...</p>",
-      createdAt: new Date("2024-01-12T08:45:00"),
-      lastModified: new Date("2024-01-12T15:10:00"),
-    },
-  ]);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
+
+  useEffect(() => {
+    const fetchDrafts = async () => {
+      const drafts = await getDrafts(getToken() || "");
+      setDrafts(await drafts.json());
+    };
+    fetchDrafts();
+  }, []);
 
   const filteredDrafts = drafts
     .filter((draft) => {
@@ -92,9 +74,16 @@ export default function DraftsPage() {
       }
     });
 
-  const handleEdit = (draftId: string) => {
-    console.log("[v0] Editing draft:", draftId);
-    // Navigate to composer with draft data
+  const handleEdit = (to: string, subject: string, body: string) => {
+    const draft = {
+      to,
+      subject,
+      body,
+    };
+    localStorage.setItem("composerFormCache", JSON.stringify(draft));
+    setTimeout(() => {
+      window.location.href = "/composer";
+    }, 1000);
   };
 
   const handleDelete = (draftId: string) => {
@@ -123,7 +112,6 @@ export default function DraftsPage() {
 
   return (
     <div className=" bg-background flex flex-col">
-
       {/* Filters and Search */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -156,6 +144,7 @@ export default function DraftsPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {filteredDrafts.map((draft) => (
+
                   <div
                     key={draft.id}
                     className="flex flex-col sm:flex-row items-start sm:items-center rounded-md border border-border bg-card px-4 py-2 hover:bg-muted transition-colors group"
@@ -182,19 +171,24 @@ export default function DraftsPage() {
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            variant="ghost"
                             size="icon"
-                            className="opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground transition-opacity"
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handleEdit(draft.id)}>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleEdit(draft.to, draft.subject, draft.body)
+                            }
+                          >
                             <Edit3 className="h-4 w-4 mr-2" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleSend(draft.id)}>
+                          <DropdownMenuItem
+                            onClick={() => handleSend(draft.id)}
+                          >
                             <Send className="h-4 w-4 mr-2" />
                             Send Now
                           </DropdownMenuItem>
