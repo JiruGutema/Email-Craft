@@ -52,8 +52,7 @@ export function ComposerForm() {
       const response = await sendEmail(emailData, getToken() || "");
       if (response.status === 401) {
         toast({
-          title: "Login Success",
-          description: "Unauthorized access. Please log in.",
+          description: "Session expired. Please logout and then login.",
         });
         setTimeout(() => {
           window.location.href = "/login";
@@ -61,10 +60,11 @@ export function ComposerForm() {
       }
 
       if (response.ok) {
-        console.log("Email sent successfully");
+        toast({description: "Email sent successfully" });
         setEmailData(defaultEmailData);
         localStorage.removeItem("composerFormCache"); // Clear cache on success
       } else {
+          toast({description: "Failed to send email", variant: "destructive" });
         console.error("Failed to send email");
       }
       console.log(await response.json())

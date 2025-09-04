@@ -65,6 +65,9 @@ export default function Home() {
               <Link href="#support" className="text-muted-foreground hover:text-foreground transition-colors">
                 Support
               </Link>
+              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+              Terms and Privacy
+              </Link>
             </nav>
 
             <div className="flex items-center gap-4">
@@ -193,21 +196,21 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                name: "Sarah Johnson",
-                role: "Marketing Director",
+                name: "Ephraim Debel",
+                role: "Software Engineer",
                 content:
                   "EmailCraft has revolutionized our email campaigns. The HTML editor is intuitive and the results are stunning.",
                 rating: 5,
               },
               {
-                name: "Michael Chen",
-                role: "Startup Founder",
+                name: "Ashenafi Godana",
+                role: "Cloud Architect",
                 content: "The user profile management and authentication system saved us weeks of development time.",
                 rating: 5,
               },
               {
-                name: "Emily Rodriguez",
-                role: "Design Lead",
+                name: "Tsedeke Techane",
+                role: "Project Manager",
                 content:
                   "Finally, an email composer that understands design. The preview feature is incredibly accurate.",
                 rating: 5,
@@ -249,7 +252,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Button size="lg" variant="outline">
-                Schedule Demo
+                Demo
               </Button>
             </div>
             
@@ -299,21 +302,13 @@ export default function Home() {
                     Features
                   </Link>
                 </li>
-                <li>
-                  <Link href="#pricing" className="hover:text-foreground transition-colors">
-                    Pricing
-                  </Link>
-                </li>
+             
                 <li>
                   <Link href="/templates" className="hover:text-foreground transition-colors">
                     Templates
                   </Link>
                 </li>
-                <li>
-                  <Link href="/integrations" className="hover:text-foreground transition-colors">
-                    Integrations
-                  </Link>
-                </li>
+             
               </ul>
             </div>
 
@@ -326,20 +321,12 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="hover:text-foreground transition-colors">
+                  <Link href="/#contact" className="hover:text-foreground transition-colors">
                     Contact Us
                   </Link>
                 </li>
-                <li>
-                  <Link href="/status" className="hover:text-foreground transition-colors">
-                    Status
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/api" className="hover:text-foreground transition-colors">
-                    API Docs
-                  </Link>
-                </li>
+              
+             
               </ul>
             </div>
 
@@ -347,7 +334,7 @@ export default function Home() {
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/privacy" className="hover:text-foreground transition-colors">
+                  <Link href="/terms" className="hover:text-foreground transition-colors">
                     Privacy Policy
                   </Link>
                 </li>
@@ -356,11 +343,7 @@ export default function Home() {
                     Terms of Service
                   </Link>
                 </li>
-                <li>
-                  <Link href="/cookies" className="hover:text-foreground transition-colors">
-                    Cookie Policy
-                  </Link>
-                </li>
+                
               </ul>
             </div>
           </div>

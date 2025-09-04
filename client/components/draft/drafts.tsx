@@ -20,9 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getDrafts } from "@/lib/drafts";
+import { deleteDraft, getDrafts } from "@/lib/drafts";
 import { getToken } from "@/lib/utils";
 import { set } from "react-hook-form";
+import { toast } from "@/hooks/use-toast";
 
 interface Draft {
   id: string;
@@ -63,8 +64,6 @@ export default function DraftsPage() {
     })
     .sort((a, b) => {
       switch (sortBy) {
-        case "date":
-          return b.lastModified.getTime() - a.lastModified.getTime();
         case "subject":
           return a.subject.localeCompare(b.subject);
         case "recipient":
@@ -86,15 +85,22 @@ export default function DraftsPage() {
     }, 1000);
   };
 
-  const handleDelete = (draftId: string) => {
-    console.log("[v0] Deleting draft:", draftId);
-    setDrafts(drafts.filter((draft) => draft.id !== draftId));
+  const handleDelete = async (draftId: string) => {
+    const draft = await deleteDraft(draftId, getToken() || "");
+    if (draft.ok) {
+      setDrafts(drafts.filter((draft) => draft.id !== draftId));
+      toast({ description: "Draft deleted successfully" });
+    } else {
+      console.error("Failed to delete draft");
+      toast({ description: "Failed to delete draft", variant: "destructive" });
+    }
   };
 
-  const handleSend = (draftId: string) => {
-    console.log("[v0] Sending draft:", draftId);
-    // Send email and remove from drafts
-    setDrafts(drafts.filter((draft) => draft.id !== draftId));
+  const handleSend = (to: string, subject: string, body: string) => {
+    toast({ description: "Please, Review it first" })
+    setTimeout(() => {
+      handleEdit(to, subject, body); 
+    }, 3000);
   };
 
   const formatDate = (date: Date) => {
@@ -144,9 +150,12 @@ export default function DraftsPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {filteredDrafts.map((draft) => (
-
+                  
                   <div
                     key={draft.id}
+                    onClick={() => handleEdit(draft.to, draft.subject, draft.body)}
+                    role="button"
+                    tabIndex={0}
                     className="flex flex-col sm:flex-row items-start sm:items-center rounded-md border border-border bg-card px-4 py-2 hover:bg-muted transition-colors group"
                   >
                     {/* Main content */}
@@ -187,7 +196,7 @@ export default function DraftsPage() {
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleSend(draft.id)}
+                            onClick={() => handleSend(draft.to, draft.subject, draft.body)}
                           >
                             <Send className="h-4 w-4 mr-2" />
                             Send Now

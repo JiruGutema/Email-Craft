@@ -23,6 +23,7 @@ import { deleteMe, getUserProfile } from "@/lib/user"
 import { set } from "react-hook-form"
 import { toast } from "../ui/use-toast"
 import { Description } from "@radix-ui/react-toast"
+import { getDrafts } from "@/lib/drafts"
 
 export function ProfileContent() {
 
@@ -35,6 +36,8 @@ export function ProfileContent() {
     profile: "",
     id: ""
   })
+  const [draftsCount, setDraftsCount] = useState(0);
+  const [templatesCount, setTemplatesCount] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,7 +69,13 @@ export function ProfileContent() {
         console.error("Error fetching user:", error);
       }
     };
+    const fetchDraftsCount = async () => {
+      const drafts = await getDrafts(getToken() || "");
+      const draftsData = await drafts.json();
+      setDraftsCount(draftsData.length);
+    };
     fetchUser();
+    fetchDraftsCount();
   }, []);
 
   const handleSave = () => {
@@ -210,14 +219,11 @@ export function ProfileContent() {
         {/* Stats Card */}
         <div className="bg-white border rounded-lg p-6 mb-6">
           <h4 className="font-semibold text-gray-900 mb-4">Email Statistics</h4>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">127</div>
-              <div className="text-sm text-gray-600">Emails Sent</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">3</div>
-              <div className="text-sm text-gray-600">Drafts</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div onClick={()=>{window.location.href = "/drafts"}
+              } className="text-center">
+              <div className="text-2xl font-bold hover:cursor-pointer text-green-600">{draftsCount}</div>
+              <div  className="text-sm text-gray-600">Drafts</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">15</div>
