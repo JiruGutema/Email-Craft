@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, NotFoundException, UnauthorizedExceptio
 import { CreateDraftDto } from './dto/create-draft.dto';
 import { UpdateDraftDto } from './dto/update-draft.dto';
 import { PrismaClient } from '@prisma/client';
+import { Logger } from 'src/utils/utils';
 
 const prisma = new PrismaClient();
 
@@ -34,6 +35,7 @@ export class DraftsService {
   async findAll() { //! Add Pagination to this page
     const res = await prisma.drafts.findMany();
     if (res) {
+      Logger.error(res)
       return res;
     } else {
       throw new NotFoundException(`No drafts found`);

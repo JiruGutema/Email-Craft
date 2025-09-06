@@ -2,19 +2,18 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, StrategyOptions } from 'passport-google-oauth20';
 import { UsersService } from 'src/users/users.service';
-import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
+import { Logger } from 'src/utils/utils';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private userService: UsersService,
-    private configService: ConfigService,
   ) {
     super({
-      clientID: configService.get<string>('GOOGLE_CLIENT_ID'),
-      clientSecret: configService.get<string>('GOOGLE_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('GOOGLE_CALLBACK_URL'),
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope: ['email', 'profile','https://www.googleapis.com/auth/gmail.send'],
       accessType: 'offline',
       prompt: 'consent',    
@@ -70,7 +69,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         name: user.name,
       };
     } catch (error) {
-      console.log('Error occurred while validating user', error);
+      Logger.error('Error occurred while validating user', error);
       return { message: 'Error occurred while validating user' };
     }
   }

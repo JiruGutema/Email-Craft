@@ -3,6 +3,7 @@ import { CreateMailDto } from './dto/create-mail.dto';
 import { UpdateMailDto } from './dto/update-mail.dto';
 import { google } from 'googleapis';
 import { PrismaClient } from '@prisma/client';
+import { Logger } from 'src/utils/utils';
 
 const prisma = new PrismaClient();
 
@@ -57,7 +58,7 @@ export class MailService {
       return { message: 'Email sent successfully!' };
     } catch (error) {
       // Only try to refresh if access token expired and refresh token exists
-      console.log('Error sending email:', error);
+      Logger.error('Error sending email:', error);
       if (
         (error.response?.data?.error === 'invalid_grant' || error.code === 401) &&
         user.googleRefreshToken
