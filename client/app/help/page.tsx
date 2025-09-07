@@ -241,32 +241,12 @@ export default function HelpPage() {
   )
 
  return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-background text-foreground">
       <ComposerSidebar />
 
       <div className="flex-1">
         
 <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-primary text-primary-foreground py-8">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-4 text-balance">Help & Documentation</h1>
-            <p className="text-xl opacity-90 mb-6 text-pretty">
-              Everything you need to know about using our email composer
-            </p>
-            <div className="relative max-w-md mx-auto">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search help articles..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-background text-foreground"
-              />
-            </div>
-          </div>
-        </div>
-      </header>
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -281,6 +261,15 @@ export default function HelpPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
+                  <Button
+                    // key="all"
+                    variant={window.location.href === "/help" ? "ghost" : "ghost"}
+                    className="w-full justify-start"
+                    onClick={() => window.location.reload()} // Simple way to reset filters
+                  >
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    All Articles  
+                  </Button>
                   {helpSections.map((section) => {
                     const Icon = section.icon
                     return (
@@ -362,7 +351,7 @@ export default function HelpPage() {
                     const isActive = activeSection === section.id
 
                     return (
-                      <Card key={section.id} className={isActive ? "ring-2 ring-primary/20" : ""}>
+                      <Card key={section.id} className={isActive ? "border-2 border-primary" : ""}>
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">

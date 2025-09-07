@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteDraft, getDrafts } from "@/lib/drafts";
-import { getToken } from "@/lib/utils";
+import { getToken, Logger } from "@/lib/utils";
 import { set } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 
@@ -91,7 +91,7 @@ export default function DraftsPage() {
       setDrafts(drafts.filter((draft) => draft.id !== draftId));
       toast({ description: "Draft deleted successfully" });
     } else {
-      console.error("Failed to delete draft");
+      Logger.error("Failed to delete draft");
       toast({ description: "Failed to delete draft", variant: "destructive" });
     }
   };

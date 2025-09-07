@@ -1,9 +1,9 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { HelpCircle, Home, Send, Menu, BookTemplate } from "lucide-react"
+import { HelpCircle, Home, Send, Menu, BookTemplate, PlusIcon, DeleteIcon, BookDashed, PaintRollerIcon, DivideIcon, ChartNoAxesColumnDecreasing } from "lucide-react"
 import { NavItem } from "@/components/nav-item"
 
-export function ComposerSidebar() {
+export function AdminSidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
@@ -43,7 +43,6 @@ export function ComposerSidebar() {
         >
           Drafts
         </NavItem>
-      
         <NavItem
           href="/help"
           icon={<HelpCircle className="h-4 w-4" />}
@@ -51,9 +50,13 @@ export function ComposerSidebar() {
         >
           Help
         </NavItem>
-        <NavItem href="/templates" icon={<BookTemplate className="h-4 w-4" />} active={pathname === "/templates"}>
+        <NavItem href="/admin/templates" icon={<PaintRollerIcon className="h-4 w-4" />} active={pathname === "/templates"}>
           Templates
         </NavItem>
+        <NavItem href="/admin/categories" icon={<ChartNoAxesColumnDecreasing className="h-4 w-4" />} active={pathname === "/categories"}>
+          Categories
+        </NavItem>
+       
       </nav>
     </div>
   )

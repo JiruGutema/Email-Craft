@@ -8,7 +8,7 @@ interface ComposerHeaderProps {
   onProfileClick: () => void
   onBack?: () => void
 }
-export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) {
+export function AdminHeader({ onProfileClick, onBack }: ComposerHeaderProps) {
   const user  = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
   return (
     <header className="flex items-center justify-between border-b w-full px-4 sm:px-6 py-4">
@@ -24,10 +24,9 @@ export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) 
           <img src="/images/logo.png" alt="Logo" className="h-8 w-8 mr-2" /> Mail Craft
         </div>
         {/* Theme toggle button */}
-     
+      
       </div>
-      <div className="flex items-center gap-4">
-   <Button
+      <div className="flex items-center gap-4">  <Button
           variant="outline"
           size="sm"
           className="ml-2"
@@ -44,23 +43,18 @@ export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) 
         </Button>
         <button
           onClick={onProfileClick}
-          className="h-8 w-8 overflow-hidden ring rounded-full hover:ring-2 hover:ring-gray-200 transition-all relative bg-gray-100"
+          className="h-8 w-8 overflow-hidden rounded-full hover:ring-2 hover:ring-gray-200 transition-all"
         >
-          {user?.picture ? (
-            <Image
-              src={user.picture}
-              alt={user.name[0]}
-              width={32}
-              height={32}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="absolute bg-red-500 inset-0 flex items-center justify-center text-lg font-semibold text-foreground-50">
-              {user?.name ? user.name[0] : "?"}
-            </span>
-          )}
+          <Image
+            src={user?.picture || "/default-profile.png"}
+            alt="Avatar"
+            width={32}
+            height={32}
+            className="h-full w-full object-cover"
+          />
         </button>
       </div>
     </header>
   )
 }
+

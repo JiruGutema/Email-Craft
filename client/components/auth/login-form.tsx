@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ApiBaseUrl } from "@/lib/utils"
+import { ApiBaseUrl, Logger } from "@/lib/utils"
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -12,7 +12,7 @@ const handleGoogleLogin = () => {
   try {
     window.location.href = `${ApiBaseUrl()}/auth/google/login`
   } catch (error) {
-    console.error("Google login failed:", error)
+    Logger.log("Google login failed:", error)
     setIsLoading(false)
   }
 }

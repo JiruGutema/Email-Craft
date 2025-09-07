@@ -18,7 +18,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog"
-import { getToken, HandleLogout } from "@/lib/utils"
+import {getToken, HandleLogout, Logger } from "@/lib/utils"
 import { deleteMe, getUserProfile } from "@/lib/user"
 import { set } from "react-hook-form"
 import { toast } from "../ui/use-toast"
@@ -53,7 +53,7 @@ export function ProfileContent() {
           }, 3000);
         }
         if (!res.ok) {
-          console.error("Failed to fetch user:", res.status, res.statusText);
+          Logger.error("Failed to fetch user:", res.status, res.statusText);
           toast({ description: "Failed to fetch user data. Please try again later.", variant: "destructive" });
           return;
         }
@@ -66,7 +66,7 @@ export function ProfileContent() {
           id: user?.id || ""
         });
       } catch (error) {
-        console.error("Error fetching user:", error);
+        Logger.error("Error fetching user:", error);
       }
     };
     const fetchDraftsCount = async () => {
@@ -80,7 +80,7 @@ export function ProfileContent() {
 
   const handleSave = () => {
     setIsEditing(false)
-    console.log("Profile saved:", profileData)
+    Logger.log("Profile saved:", profileData)
   }
 
 
@@ -94,7 +94,7 @@ export function ProfileContent() {
     setIsDeleting(true)
     try {
       const res = await deleteMe(getToken() || '');
-      console.log(await res.json());
+      Logger.log(await res.json());
       if(res.ok){
             localStorage.removeItem("user");
         localStorage.removeItem("token");
@@ -129,7 +129,7 @@ export function ProfileContent() {
       }
       
       if (!res.ok) {
-        console.error("Failed to delete account:", res.status, res.statusText)
+        Logger.error("Failed to delete account:", res.status, res.statusText)
         toast({ description: "Failed to delete account. Please try again.", variant: "destructive" })
         setIsDeleting(false)
         return
@@ -144,7 +144,7 @@ export function ProfileContent() {
         window.location.href = "/"
       }, 3000);
     } catch (error) {
-      console.error("Error deleting account:", error)
+      Logger.error("Error deleting account:", error)
       toast({ description: "An error occurred. Please try again.", variant: "destructive" })
       setIsDeleting(false)
     }
@@ -155,21 +155,21 @@ export function ProfileContent() {
     <div className="p-6">
       <div className="max-w-2xl mx-auto">
         {/* Profile Card */}
-        <div className="bg-white border rounded-lg p-6 mb-6">
+        <div className="bg-background border rounded-lg p-6 mb-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="h-20 w-20 overflow-hidden rounded-full">
-              <Image
+              <img
                 src={profileData?.profile || '/default-profile.png'}
-                alt="Profile Picture"
+                alt={profileData.name[0]}
                 width={80}
                 height={80}
                 className="h-full w-full object-cover"
               />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-gray-900">{profileData.name}</h3>
-              <p className="text-gray-600">{profileData.email}</p>
-              <p className="text-sm text-gray-500 mt-1">{profileData.username}</p>
+              <h3 className="text-xl font-semibold text-foreground-900">{profileData.name}</h3>
+              <p className="text-foreground-600">{profileData.email}</p>
+              <p className="text-sm text-foreground-500 mt-1">{profileData.username}</p>
             </div>
             <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="gap-2">
               <Edit className="h-4 w-4" />
@@ -180,14 +180,14 @@ export function ProfileContent() {
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">Name</label>
                 <Input
                   value={profileData.name}
                   onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">Email</label>
                 <Input
                   type="email"
                   value={profileData.email}
@@ -195,7 +195,7 @@ export function ProfileContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">Company</label>
                 <Input
                   value={profileData.username}
                   onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
@@ -217,8 +217,8 @@ export function ProfileContent() {
         </div>
 
         {/* Stats Card */}
-        <div className="bg-white border rounded-lg p-6 mb-6">
-          <h4 className="font-semibold text-gray-900 mb-4">Email Statistics</h4>
+        <div className="bg-background border rounded-lg p-6 mb-6">
+          <h4 className="font-semibold text-foreground-900 mb-4">Email Statistics</h4>
           <div className="grid grid-cols-2 gap-4">
             <div onClick={()=>{window.location.href = "/drafts"}
               } className="text-center">
@@ -233,14 +233,14 @@ export function ProfileContent() {
         </div>
 
         {/* Actions Card */}
-        <div className="bg-white border rounded-lg p-6">
-          <h4 className="font-semibold text-gray-900 mb-4">Account Actions</h4>
+        <div className="bg-background border rounded-lg p-6">
+          <h4 className="font-semibold text-foreground-900 mb-4">Account Actions</h4>
           <div className="flex flex-row justify-between">
             <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
               <DialogTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-60 justify-start mt-0 text-black border-red-500 hover:bg-primary bg-transparent"
+                  className="w-60 justify-start mt-0 text-foreground hover:text-background border-red-500 hover:bg-foreground bg-transparent"
                 >
                   <LogOutIcon className="h-4 w-4" />
                   Logout

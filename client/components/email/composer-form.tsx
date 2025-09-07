@@ -11,7 +11,7 @@ import Prism from "prismjs";
 import "prismjs/themes/prism.css";
 import "prismjs/components/prism-markup"; // For HTML highlighting
 import { sendEmail } from "@/lib/email";
-import { getToken } from "@/lib/utils";
+import {getToken, HandleLogout, Logger } from "@/lib/utils";
 import { saveDraft } from "@/lib/drafts";
 import { toast } from "@/hooks/use-toast";
 
@@ -27,6 +27,7 @@ export function ComposerForm() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
+        Logger.log("Loaded cached form data:", parsed);
         setEmailData({ ...defaultEmailData, ...parsed });
       } catch {
         setEmailData(defaultEmailData);
@@ -64,12 +65,18 @@ export function ComposerForm() {
         setEmailData(defaultEmailData);
         localStorage.removeItem("composerFormCache"); // Clear cache on success
       } else {
+        if(response.status === 401) {
+          HandleLogout();
+          const resData = await response.json();
+          toast({description: "Session Expired, Please login again!", variant: "destructive" });
+        }else {
           toast({description: "Failed to send email", variant: "destructive" });
-        console.error("Failed to send email");
+        }
+        Logger.error("Failed to send email");
       }
-      console.log(await response.json())
+      Logger.log(await response.json())
     } catch (error) {
-      console.error("Error sending email:", error);
+      Logger.error("Error sending email:", error);
     } finally {
       setIsSending(false);
     }
@@ -88,13 +95,13 @@ export function ComposerForm() {
             window.location.href = "/login";
           }, 3000);
         } else if (response.ok) {
-          console.log(await response.json());
+          Logger.log(await response.json());
           toast({ title: "", description: "Draft saved successfully" });
         } else {
           toast({ title: "Error", description: "Failed to save draft" });
         }
       } catch (error) {
-        console.error("Error saving draft:", error);
+        Logger.error("Error saving draft:", error);
       }
     } else {
       toast({ title: "", description: "No changes to save" });
@@ -102,7 +109,7 @@ export function ComposerForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto bg-background text-foreground">
       {/* Email Form */}
       <div className="space-y-6">
         <div className="grid grid-cols-1 gap-4">
@@ -188,14 +195,16 @@ export function ComposerForm() {
                   fontFamily: '"Fira code", "Fira Mono", monospace',
                   fontSize: 14,
                   minHeight: 400,
-                  background: "#f5f5f5",
                   borderRadius: 0,
                   border: "1px solid #e5e7eb",
                   color: "#333",
+                  height: "400px",
+                  overflow: "scroll",
                 }}
                 textareaId="html-editor"
                 textareaClassName="font-mono"
                 placeholder="Enter your HTML content here..."
+                className="bg-background text-foreground"
               />
             </TabsContent>
 

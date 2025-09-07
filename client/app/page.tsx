@@ -53,7 +53,7 @@ export default function Home() {
             <div className="flex items-center gap-2">
               <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
               
-              <span className="text-xl font-semibold text-foreground">EmailCraft</span>
+              <span className="text-xl font-semibold text-foreground">Email Craft</span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
               <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -289,7 +289,7 @@ export default function Home() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                  <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
-                <Link href={""} onClick={()=>{window.location.href="/"}}><span className="text-lg font-semibold">EmailCraft</span></Link>
+                <Link href={""} onClick={()=>{window.location.href="/"}}><span className="text-lg font-semibold">Email Craft</span></Link>
               </div>
               <p className="text-muted-foreground text-sm">Professional email composition made simple and beautiful.</p>
             </div>
@@ -349,7 +349,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} EmailCraft. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Email Craft. All rights reserved.</p>
           </div>
         </div>
       </footer>

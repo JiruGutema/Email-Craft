@@ -25,7 +25,7 @@ export default function Draft() {
   }
 
     return (
-    <div className="flex h-screen bg-white">
+    <div className="flex h-screen bg-background text-foreground">
       <ComposerSidebar />
 
       <div className="flex-1">

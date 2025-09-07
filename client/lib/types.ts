@@ -36,4 +36,18 @@ export interface DraftData {
   subject: string
   body: string
 }
+
+export interface TemplateData {
+  id?: string;
+  title: string;
+  description: string;
+  categoryId: string;
+  htmlContent: string;
+  tags: string[];
+}
+
+export interface CategoryData {
+  id?: string;
+  name: string;
+}
 export type ViewType = "login" | "signup" | "composer" | "profile"

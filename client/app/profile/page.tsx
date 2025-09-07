@@ -1,11 +1,11 @@
 'use client'
-import { ProfileSidebar } from "@/components/profile/profile-sidebar"
 import { ComposerHeader } from "@/components/email/composer-header"
 import { ProfileContent } from "@/components/profile/profile-content"
 import { AuthGuard } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Spinner from "@/components/spinner"
+import { ComposerSidebar } from "@/components/email/composer-sidebar"
 
 export default function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -25,11 +25,8 @@ export default function ProfilePage() {
     )
   }
   return (
-    <div className="flex h-screen bg-white">
-      <ProfileSidebar
-        onBack={() => {
-          window.location.href = "/composer"
-        }}
+    <div className="flex h-screen bg-background text-foreground">
+      <ComposerSidebar
       />
 
       <div className="flex-1">

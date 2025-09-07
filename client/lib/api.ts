@@ -35,6 +35,7 @@ export async function apiFetch(
 
   const res = await fetch(url, fetchOptions);
   return res;
+
 }
 
 // Example usage:

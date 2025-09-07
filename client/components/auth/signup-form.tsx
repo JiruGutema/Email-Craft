@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Logger } from "@/lib/utils"
 
 export function SignupForm() {
   const [isLoading, setIsLoading] = useState(false)
@@ -11,7 +12,7 @@ export function SignupForm() {
     try {
       window.location.href = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google/login`
     } catch (error) {
-      console.error("Google signup failed:", error)
+      Logger.error("Google signup failed:", error)
       setIsLoading(false)
     }
   }
