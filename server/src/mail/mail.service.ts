@@ -58,7 +58,6 @@ export class MailService {
       return { message: 'Email sent successfully!' };
     } catch (error) {
       // Only try to refresh if access token expired and refresh token exists
-      Logger.error('Error sending email:', error);
       if (
         (error.response?.data?.error === 'invalid_grant' || error.code === 401) &&
         user.googleRefreshToken

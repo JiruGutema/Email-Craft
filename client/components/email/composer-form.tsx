@@ -181,7 +181,7 @@ export function ComposerForm() {
             >
               <ClipboardPaste className="h-8 w-8" />
             </Button>
-            <TabsContent value="compose" className="mt-4">
+            <TabsContent value="compose" style={{ height: "500px", overflow: "auto" }} >
               <Editor
                 value={emailData.body}
                 onValueChange={(code) =>
@@ -198,8 +198,8 @@ export function ComposerForm() {
                   borderRadius: 0,
                   border: "1px solid #e5e7eb",
                   color: "#333",
-                  height: "400px",
-                  overflow: "scroll",
+                  // height: "400px",
+                  // overflow: "auto",
                 }}
                 textareaId="html-editor"
                 textareaClassName="font-mono"

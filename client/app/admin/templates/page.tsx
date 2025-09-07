@@ -15,6 +15,8 @@ import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
 import { Code, Eye, ClipboardPaste, ArrowLeft, Search } from "lucide-react";
 import Prism from "prismjs";
+import "prismjs/components/prism-markup";
+import "prismjs/themes/prism.css";
 import Editor from "react-simple-code-editor";
 import { getToken, HandleLogout, Logger } from "@/lib/utils";
 import { AdminHeader } from "@/components/admin/admin-header";
@@ -328,7 +330,7 @@ export default function TemplatesPage() {
                     Email Content
                   </label>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
-                    <div className="flex items-center">
+                    <div className="flex items-center mb-2">
                       <TabsList className="flex flow-col gap-2">
                         <TabsTrigger
                           value="compose"
@@ -358,7 +360,7 @@ export default function TemplatesPage() {
                       </Button>
                     </div>
 
-                    <TabsContent value="compose" className="mt-4">
+                    <TabsContent value="compose" style={{ height: "420px", overflow: "auto" }}>
                       <Editor
                         value={form.htmlContent}
                         onValueChange={(code) =>
@@ -380,8 +382,6 @@ export default function TemplatesPage() {
                           borderRadius: 0,
                           border: "1px solid #e5e7eb",
                           color: "#333",
-                          height: "400px",
-                          overflow: "scroll",
                         }}
                         textareaId="html-editor"
                         textareaClassName="font-mono"
@@ -432,35 +432,96 @@ export default function TemplatesPage() {
                 <Input
                   placeholder="Description"
                   value={form.description}
-                  onChange={(e) =>
-                    setForm({ ...form, description: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
                   required
                 />
                 <Input
                   placeholder="Category"
                   value={form.categoryId}
-                  onChange={(e) =>
-                    setForm({ ...form, categoryId: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
                   required
                 />
                 <Input
                   placeholder="Tags (comma separated)"
                   value={form.tags.join(",")}
-                  onChange={(e) =>
-                    setForm({ ...form, tags: e.target.value.split(",") })
-                  }
+                  onChange={(e) => setForm({ ...form, tags: e.target.value.split(",") })}
                 />
-                <textarea
-                  placeholder="HTML Content"
-                  value={form.htmlContent}
-                  onChange={(e) =>
-                    setForm({ ...form, htmlContent: e.target.value })
-                  }
-                  className="w-full min-h-[120px] p-2 border rounded"
-                  required
-                />
+                {/* HTML Editor & Preview for Edit Dialog */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Content</label>
+                  <Tabs value={activeTab} onValueChange={setActiveTab}>
+                    <div className="flex items-center mb-2">
+                      <TabsList className="flex flow-col gap-2">
+                        <TabsTrigger
+                          value="compose"
+                          className="gap-2 flex center bg-foreground text-background rounded-sm p-2"
+                        >
+                          <Code className="h-4 w-4 " /> HTML Editor
+                        </TabsTrigger>
+                        <TabsTrigger
+                          value="preview"
+                          className="gap-2 flex center bg-foreground text-background rounded-sm p-2"
+                        >
+                          <Eye className="h-4 w-4" /> Preview
+                        </TabsTrigger>
+                      </TabsList>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="ml-4"
+                        onClick={async () => {
+                          if (navigator.clipboard) {
+                            const text = await navigator.clipboard.readText();
+                            setForm((prev) => ({ ...prev, htmlContent: text }));
+                          }
+                        }}
+                      >
+                        <ClipboardPaste className="h-8 w-8" />
+                      </Button>
+                    </div>
+                    <TabsContent value="compose" style={{ height: "420px", overflow: "auto" }}>
+                      <Editor
+                        value={form.htmlContent}
+                        onValueChange={(code) =>
+                          setForm((prev) => ({ ...prev, htmlContent: code }))
+                        }
+                        highlight={(code) =>
+                          Prism.highlight(
+                            code,
+                            Prism.languages.markup,
+                            "markup"
+                          )
+                        }
+                        padding={16}
+                        style={{
+                          fontFamily: '"Fira code", "Fira Mono", monospace',
+                          fontSize: 14,
+                          minHeight: 400,
+                          background: "#f5f5f5",
+                          borderRadius: 0,
+                          border: "1px solid #e5e7eb",
+                          color: "#333",
+                        }}
+                        textareaId="html-editor-edit"
+                        textareaClassName="font-mono"
+                        placeholder="Enter your HTML content here..."
+                      />
+                    </TabsContent>
+                    <TabsContent value="preview" className="mt-4">
+                      <div className="border p-4 min-h-[400px] max-h-[400px] bg-gray-50 overflow-auto rounded">
+                        <div className="bg-white p-6">
+                          <div
+                            style={{ overflow: "auto", maxHeight: "320px" }}
+                            dangerouslySetInnerHTML={{
+                              __html:
+                                form.htmlContent || '<p class="text-gray-500">No content to preview</p>',
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </div>
                 <Button type="submit" className="w-full">
                   Update
                 </Button>

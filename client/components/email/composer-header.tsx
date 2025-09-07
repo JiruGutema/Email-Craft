@@ -39,9 +39,7 @@ export function ComposerHeader({ onProfileClick, onBack }: ComposerHeaderProps) 
         >
           <MoonStar className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" className="hidden sm:inline-flex">
-          <Bell className="h-4 w-4" />
-        </Button>
+     
         <button
           onClick={onProfileClick}
           className="h-8 w-8 overflow-hidden ring rounded-full hover:ring-2 hover:ring-gray-200 transition-all relative bg-gray-100"

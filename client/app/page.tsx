@@ -6,7 +6,7 @@ import { toast } from "@/hooks/use-toast"
 import { subscribe } from "@/lib/subscribe"
 import { AuthGuard } from "@/lib/utils"
 import { Description } from "@radix-ui/react-toast"
-import { Mail, Edit3, User, Shield, Star, ArrowRight, Check } from "lucide-react"
+import { Mail, Edit3, User, Shield, Star, ArrowRight, Check, MoonStar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -71,6 +71,18 @@ export default function Home() {
             </nav>
 
             <div className="flex items-center gap-4">
+   <Button
+          variant="outline"
+          size="sm"
+          className="ml-2"
+          onClick={() => {
+            if (typeof window !== "undefined") {
+              document.documentElement.classList.toggle("dark");
+            }
+          }}
+        >
+          <MoonStar className="h-4 w-4" />
+        </Button>
               {isAuthenticated ? (
               <Link href="/profile">
                 
@@ -149,6 +161,10 @@ export default function Home() {
                 <CardDescription className="text-center">
                   Create beautiful, responsive HTML emails with our intuitive editor. Real-time preview and professional
                   templates included.
+                  <p className="mt-2 text-red-500">
+                    All HTML rendering is done on the client side for maximum privacy and security. which means your HTML
+                    is never exposed to the server and is only processed in the user's browser.
+                  </p>
                 </CardDescription>
               </CardContent>
             </Card>
@@ -164,6 +180,12 @@ export default function Home() {
                 <CardDescription className="text-center">
                   Manage your account, track email statistics, and customize your workspace with comprehensive user
                   profile management.
+                  <p className="mt-2">
+                    Your profile data is securely stored and managed, your active sessions are monitored, and you have full control
+                    over your account settings.
+                  </p> <p className="m-2 text-red-500 font-bold">your active session lasts for maximum 60 minutes of inactivity. </p>
+                  
+
                 </CardDescription>
               </CardContent>
             </Card>
@@ -179,6 +201,9 @@ export default function Home() {
                 <CardDescription className="text-center">
                   Enterprise-grade security with Google OAuth integration. Your data is protected with industry-standard
                   encryption.
+               
+                   Ensuring a secure and seamless login experience without handling passwords directly.
+              
                 </CardDescription>
               </CardContent>
             </Card>

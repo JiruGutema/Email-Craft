@@ -182,4 +182,262 @@ function seedTemplates() {
   });
 }
 
-seedTemplates();
+
+const Mini = [
+  {
+    title: "Welcome Onboard",
+    description: "General onboarding welcome email",
+    categoryId: "Onboarding",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif;">
+        <h2 style="color:#1f2937;">Welcome Aboard!</h2>
+        <p style="color:#555;">We’re delighted to have you join us. This is the start of an exciting journey together.</p>
+        <p style="color:#555;">Stay tuned for resources, guidance, and updates to help you succeed.</p>
+        <p style="text-align:center; margin-top:20px;">
+          <a href="#" style="background:#3b82f6; color:white; padding:10px 20px; text-decoration:none; border-radius:4px;">Get Started</a>
+        </p>
+      </div>
+    `,
+    tags: ["welcome", "onboarding"],
+  },
+  {
+    title: "New Member Welcome",
+    description: "Welcome new community or club members",
+    categoryId: "Membership",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif; text-align:center;">
+        <h2 style="color:#1f2937;">Welcome to the Community</h2>
+        <p style="color:#555;">You’re officially part of our growing family of members.</p>
+        <p style="color:#555;">Engage, share, and explore all that we have to offer.</p>
+        <p style="color:#9ca3af; font-size:14px;">We can’t wait to see you thrive here.</p>
+      </div>
+    `,
+    tags: ["welcome", "member", "community"],
+  },
+  {
+    title: "Internship Welcome",
+    description: "Welcome message for new interns",
+    categoryId: "Internship",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif;">
+        <h2 style="color:#1f2937;">Welcome, Intern!</h2>
+        <p style="color:#555;">Congratulations on joining our internship program.</p>
+        <p style="color:#555;">This will be a time to learn, contribute, and grow alongside professionals in your field.</p>
+        <p style="color:#9ca3af; font-size:14px;">We’re excited to mentor and support you throughout this journey.</p>
+      </div>
+    `,
+    tags: ["welcome", "internship", "career"],
+  },
+  {
+    title: "Employee Welcome",
+    description: "Welcome email for new employees",
+    categoryId: "HR",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif;">
+        <h2 style="color:#1f2937;">Welcome to the Team</h2>
+        <p style="color:#555;">We’re thrilled to have you as part of our company.</p>
+        <p style="color:#555;">Your skills, passion, and ideas will help us shape the future together.</p>
+        <p style="color:#9ca3af; font-size:14px;">Looking forward to achieving great things with you.</p>
+      </div>
+    `,
+    tags: ["welcome", "employee", "team"],
+  },
+  {
+    title: "Client Welcome",
+    description: "Welcome email for new clients or customers",
+    categoryId: "Client",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif; text-align:center;">
+        <h2 style="color:#1f2937;">Welcome to Our Services</h2>
+        <p style="color:#555;">Thank you for choosing us. We’re committed to delivering the best solutions tailored to your needs.</p>
+        <p style="color:#555;">Our team will be in touch to guide you through the first steps.</p>
+        <p style="color:#9ca3af; font-size:14px;">We’re honored to start this partnership with you.</p>
+      </div>
+    `,
+    tags: ["welcome", "client", "customer"],
+  },
+  {
+    title: "Student Welcome",
+    description: "Welcome email for students joining a course or program",
+    categoryId: "Education",
+    htmlContent: `
+      <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif;">
+        <h2 style="color:#1f2937;">Welcome to the Program</h2>
+        <p style="color:#555;">We’re excited to have you join our learning community.</p>
+        <p style="color:#555;">This program will provide you with resources, mentorship, and opportunities to grow academically and personally.</p>
+        <p style="color:#9ca3af; font-size:14px;">Let’s begin this journey of knowledge together.</p>
+      </div>
+    `,
+    tags: ["welcome", "student", "education"],
+  },
+];
+
+const welcomeTemplates = [
+  {
+    title: "Welcome Onboard",
+    description: "Stylish onboarding welcome email",
+    categoryId: "Onboarding",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#f9fafb;">
+        <header style="background:#3b82f6;color:white;padding:30px;text-align:center;">
+          <h1 style="margin:0;font-size:24px;">Welcome Aboard!</h1>
+        </header>
+        <div style="padding:30px;background:white;">
+          <p style="color:#555;">We’re excited to have you with us. This marks the beginning of something amazing.</p>
+          <p style="color:#555;">Explore our resources and get started with confidence.</p>
+          <div style="text-align:center;margin-top:20px;">
+            <a href="#" style="background:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;">Get Started</a>
+          </div>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "onboarding"],
+  },
+  {
+    title: "New Member Welcome",
+    description: "Warm welcome for new members",
+    categoryId: "Membership",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#f1f5f9;">
+        <div style="padding:40px;background:white;border-radius:8px;text-align:center;">
+          <h2 style="color:#1f2937;">Welcome to the Community</h2>
+          <p style="color:#6b7280;">You’re officially part of our family! Engage, share, and make the most of your membership.</p>
+          <div style="margin-top:20px;">
+            <a href="#" style="background:#10b981;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">Explore Now</a>
+          </div>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "member", "community"],
+  },
+  {
+    title: "Internship Welcome",
+    description: "Stylish welcome for interns",
+    categoryId: "Internship",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#fff7ed;">
+        <header style="background:#f97316;color:white;padding:25px;text-align:center;">
+          <h1 style="margin:0;">Welcome, Intern!</h1>
+        </header>
+        <div style="padding:30px;">
+          <p style="color:#444;">Congratulations on joining our internship program. This is your opportunity to learn, grow, and make an impact.</p>
+          <p style="color:#444;">We can’t wait to see your contributions!</p>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "internship", "career"],
+  },
+  {
+    title: "Employee Welcome",
+    description: "Modern welcome for new employees",
+    categoryId: "HR",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;">
+        <div style="background:linear-gradient(135deg,#6366f1,#3b82f6);padding:30px;text-align:center;color:white;">
+          <h1 style="margin:0;">Welcome to the Team</h1>
+        </div>
+        <div style="padding:30px;background:white;">
+          <p style="color:#555;">We’re thrilled to have you join our company. Your skills and ideas will help us achieve great things together.</p>
+          <p style="color:#555;">Let’s make this journey a rewarding one!</p>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "employee", "team"],
+  },
+  {
+    title: "Client Welcome",
+    description: "Professional client welcome email",
+    categoryId: "Client",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;background:#eef2ff;">
+        <div style="background:white;padding:40px;border-radius:8px;text-align:center;">
+          <h2 style="color:#1e3a8a;">Welcome to Our Services</h2>
+          <p style="color:#4b5563;">Thank you for trusting us. We’re committed to delivering top-quality solutions tailored to your needs.</p>
+          <div style="margin-top:20px;">
+            <a href="#" style="background:#1e3a8a;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;">View Dashboard</a>
+          </div>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "client", "customer"],
+  },
+  {
+    title: "Student Welcome",
+    description: "Engaging welcome for students",
+    categoryId: "Education",
+    htmlContent: `
+      <div style="max-width:600px;margin:0 auto;font-family:Arial,sans-serif;">
+        <header style="background:#16a34a;color:white;padding:30px;text-align:center;">
+          <h1 style="margin:0;">Welcome to the Program</h1>
+        </header>
+        <div style="padding:30px;background:white;">
+          <p style="color:#444;">We’re excited to have you join our learning community. Here you’ll find guidance, mentorship, and resources to excel.</p>
+          <p style="color:#444;">Let’s begin this journey of knowledge together.</p>
+          <p style="text-align:center;margin-top:20px;">
+            <a href="#" style="background:#16a34a;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;">Start Learning</a>
+          </p>
+        </div>
+      </div>
+    `,
+    tags: ["welcome", "student", "education"],
+  },
+  {
+    title: "contribution Thank You",
+    description: "Thank you email for contributions",
+    categoryId: "Education",
+    htmlContent: `
+      <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
+  <div style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); padding: 40px 20px; text-align: center;">
+    <h1 style="color: white; margin: 0; font-size: 32px;">Thank You!</h1>
+    <p style="color: #e0e7ff; margin: 15px 0 0 0; font-size: 18px;">Your contribution makes a difference</p>
+  </div>
+  
+  <div style="padding: 40px 20px; background: white;">
+    <p style="color: #6b7280; line-height: 1.6; margin-bottom: 20px;">
+      Dear [Recipient Name],
+    </p>
+    
+    <p style="color: #6b7280; line-height: 1.6; margin-bottom: 30px;">
+      I wanted to take a moment to express my sincere appreciation for [specific contribution/action]. Your [dedication/expertise/support] has been instrumental in [specific outcome/achievement].
+    </p>
+
+    <p style="color: #6b7280; line-height: 1.6; margin-bottom: 30px;">
+      Your professionalism and commitment to excellence continue to inspire the entire team. Thank you for going above and beyond to ensure our success.
+    </p>
+
+    <p style="color: #6b7280; line-height: 1.6; margin-bottom: 20px;">
+      I look forward to continuing our collaboration and achieving even greater success together.
+    </p>
+
+    <p style="color: #6b7280; line-height: 1.6;">
+      With gratitude,<br>
+      [Your Name]<br>
+      [Your Title]
+    </p>
+  </div>
+  
+  <footer style="background: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #e5e7eb;">
+    <p style="color: #9ca3af; margin: 0; font-size: 14px;">
+      [Company Name] • [Address] • [Contact Information]
+    </p>
+  </footer>
+</div>
+    `,
+    tags: ["welcome", "student", "education"],
+  },
+];
+
+
+
+
+function seedWelcomeTemplates() {
+  welcomeTemplates.forEach(async (template) => {
+    template.categoryId = 'b229b57d-4bcd-4aad-b50a-1e0db082039b';
+    let createdTemplate = await prisma.emailTemplates.create({
+      data: template,
+    });
+    console.log(`Created welcome template with ID: ${createdTemplate.id}`);
+  });
+}
+seedWelcomeTemplates();
+// seedTemplates();
