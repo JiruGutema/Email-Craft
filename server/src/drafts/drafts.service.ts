@@ -35,7 +35,6 @@ export class DraftsService {
   async findAll() { //! Add Pagination to this page
     const res = await prisma.drafts.findMany();
     if (res) {
-      Logger.error(res)
       return res;
     } else {
       throw new NotFoundException(`No drafts found`);

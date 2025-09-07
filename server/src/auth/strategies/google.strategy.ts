@@ -32,16 +32,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       let username = baseUsername;
       let usernameExists = await this.userService.findOneByUsername(username);
 
-      // Alternative: Use crypto.randomBytes for unique suffix
-      if (usernameExists && usernameExists.email === email) {
+      if (usernameExists && usernameExists.email !== email) {
         do {
-          const suffix = randomBytes(3).toString('hex'); // 6 hex chars
+          const suffix = randomBytes(3).toString('hex');
           username = `${baseUsername}_${suffix}`;
           usernameExists = await this.userService.findOneByUsername(username);
         } while (usernameExists);
       }
 
       let user = await this.userService.findOneByEmail(email);
+      let role = 'user';
+
+      if (user) {
+        role = user.role;
+      }
 
       if (!user) {
         const password = '_google_oauth_user_';
@@ -52,25 +56,26 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
           picture,
           username,
         });
-    }
-    if (user) {
-      await this.userService.updateGoogleTokens(user.id, accessToken, refreshToken);
-    }
-
-      if (!user) {
-        return { message: 'User registration failed' };
+      }
+      if (user) {
+        await this.userService.updateGoogleTokens(user.id, accessToken, refreshToken);
       }
 
-      return {
+      if (!user) {
+        return done(null, false, { message: 'User registration failed' });
+      }
+
+      return done(null, {
         id: user.id,
         username: user.username,
         email: user.email,
         picture: user.picture,
         name: user.name,
-      };
+        role: role,
+      });
     } catch (error) {
       Logger.error('Error occurred while validating user', error);
-      return { message: 'Error occurred while validating user' };
+      return done(error, null);
     }
   }
 }

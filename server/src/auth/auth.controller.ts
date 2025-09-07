@@ -46,11 +46,23 @@ export class AuthController {
   @Get('google/login')
   async loginGoogle() {}
 
+  @Get("is-admin")
+  @UseGuards(AuthGuard)
+  isAdmin(@Req() req) {
+    return req.user.role === 'admin';
+  }
+
+  @Get('is-super-admin')
+  @UseGuards(AuthGuard)
+  isSuperAdmin(@Req() req) {
+    return req.user.role === 'superadmin';
+  }
+
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
   @Redirect('http://localhost:3001/login/success', 302)
   async googleAuthRedirect(@Request() req) {
-    const payload = { username: req.user.username, sub: req.user.id };
+    const payload = { username: req.user.username, sub: req.user.id, role: req.user.role };
     const token = await this.jwtService.signAsync(payload);
     return {
       url: `http://localhost:3001/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,

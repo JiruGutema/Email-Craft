@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { MailModule } from './mail/mail.module';
 import { SubscriptionModule } from './subscription/subscription.module';
 import { DraftsModule } from './drafts/drafts.module';
+import { TemplatesModule } from './templates/templates.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { DraftsModule } from './drafts/drafts.module';
     MailModule,
     SubscriptionModule,
     DraftsModule,
+    TemplatesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

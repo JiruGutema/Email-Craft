@@ -11,12 +11,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  user
+  admin
+  superadmin
+}
 
 model Users {
   id        String   @id @default(uuid())
   username  String   @unique
   email     String   @unique
   name      String?
+  role      UserRole @default(user)
   password  String   @db.VarChar(255)
   picture   String?  @default("")
   googleAccessToken String? @db.VarChar(255)
@@ -43,4 +49,29 @@ model Drafts {
   updatedAt DateTime @updatedAt
 
   user      Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model EmailTemplates {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  categoryId  String
+  htmlContent String
+  tags        String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    TemplateCategories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+}
+
+model TemplateCategories {
+  id        String           @id @default(uuid())
+  name      String           @unique
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  templates EmailTemplates[]
 }
