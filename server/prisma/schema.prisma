@@ -29,6 +29,7 @@ model Users {
   googleRefreshToken String? @db.VarChar(255)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  favorites Favorites[]
   
   drafts    Drafts[]
 }
@@ -63,6 +64,7 @@ model EmailTemplates {
   updatedAt   DateTime @updatedAt
 
   category    TemplateCategories @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  favorites   Favorites[]
 
   @@index([categoryId])
 }
@@ -74,4 +76,18 @@ model TemplateCategories {
   updatedAt DateTime         @updatedAt
 
   templates EmailTemplates[]
+}
+
+model Favorites {
+  id          String   @id @default(uuid())
+  userId      String
+  templateId  String
+  createdAt   DateTime @default(now())
+
+  user        Users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  template    EmailTemplates @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, templateId])
+  @@index([userId])
+  @@index([templateId])
 }

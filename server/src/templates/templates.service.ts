@@ -79,4 +79,83 @@ export class TemplatesService {
     }
     return template;
   }
+
+  async favoriteTemplate(userId: string, templateId: string) {
+    const findTemplate = await prisma.emailTemplates.findUnique({
+      where: { id: templateId },
+    });
+    if (!findTemplate) {
+      throw new NotFoundException('Template not found');
+    }
+
+    const alreadyFavorited = await prisma.favorites.findFirst({
+      where: {
+        userId,
+        templateId,
+      },
+    });
+
+    if (alreadyFavorited) {
+      throw new Error('Template already favorited');
+    }
+
+    const favorite = await prisma.favorites.create({
+      data: {
+        userId,
+        templateId,
+      },
+    });
+
+    if (!favorite) {
+      throw new Error('Error favoriting template');
+    }
+
+    return favorite;
+  }
+
+  async unfavoriteTemplate(userId: string, templateId: string) {
+    const findTemplate = await prisma.emailTemplates.findUnique({
+      where: { id: templateId },
+    });
+    if (!findTemplate) {
+      throw new NotFoundException('Template not found');
+    }
+
+    const alreadyFavorited = await prisma.favorites.findFirst({
+      where: {
+        userId,
+        templateId,
+      },
+    });
+
+    if (!alreadyFavorited) {
+      throw new Error('Template not favorited');
+    }
+
+    const unfavorite = await prisma.favorites.deleteMany({
+      where: {
+        userId,
+        templateId,
+      },
+    });
+
+    if (!unfavorite) {
+      throw new Error('Error unfavoriting template');
+    }
+
+    return { message: 'Template unfavorited successfully' };
+  }
+
+  async getUserFavorites(userId: string) {
+    const favorites = await prisma.favorites.findMany({
+      where: { userId },
+      include: { template: true },
+    });
+
+    if (!favorites) {
+      throw new NotFoundException('No favorites found for this user');
+    }
+
+    return favorites.map(fav => fav.template);
+  }
 }

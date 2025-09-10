@@ -439,5 +439,7 @@ function seedWelcomeTemplates() {
     console.log(`Created welcome template with ID: ${createdTemplate.id}`);
   });
 }
+
 seedWelcomeTemplates();
 // seedTemplates();
+
