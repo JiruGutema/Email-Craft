@@ -10,8 +10,6 @@ import {
   Trash2,
   Send,
   Mail,
-  Filter,
-  SortDesc,
   MoreVertical,
 } from "lucide-react";
 import {

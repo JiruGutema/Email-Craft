@@ -158,7 +158,7 @@ export function ProfileContent() {
         <div className="bg-background border rounded-lg p-6 mb-6">
           <div className="flex items-center gap-4 mb-6">
             <div className="h-20 w-20 overflow-hidden rounded-full">
-              <img
+              <Image
                 src={profileData?.profile || '/default-profile.png'}
                 alt={profileData.name[0]}
                 width={80}

@@ -5,8 +5,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
 import { subscribe } from "@/lib/subscribe"
 import { AuthGuard } from "@/lib/utils"
-import { Description } from "@radix-ui/react-toast"
-import { Mail, Edit3, User, Shield, Star, ArrowRight, Check, MoonStar } from "lucide-react"
+import { Edit3, User, Shield, Star, ArrowRight, MoonStar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 
@@ -17,6 +16,7 @@ export default function Home() {
   const [email, setEmail] = useState("");
 
   useEffect(() => {
+
     const checkAuth = async () => {
       const isAuth = AuthGuard();
       setIsAuthenticated(isAuth);

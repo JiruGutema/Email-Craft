@@ -27,7 +27,6 @@ export function ComposerForm() {
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        Logger.log("Loaded cached form data:", parsed);
         setEmailData({ ...defaultEmailData, ...parsed });
       } catch {
         setEmailData(defaultEmailData);
@@ -169,7 +168,6 @@ export function ComposerForm() {
             </TabsList>
             <Button
               type="button"
-              // variant="outline"
               size="sm"
               className="ml-4"
               onClick={async () => {
@@ -179,7 +177,7 @@ export function ComposerForm() {
                 }
               }}
             >
-              <ClipboardPaste className="h-8 w-8" />
+              <p>Paste</p>
             </Button>
             <TabsContent value="compose" style={{ height: "500px", overflow: "auto" }} >
               <Editor

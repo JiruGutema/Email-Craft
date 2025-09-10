@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { usePathname } from "next/navigation"
-import { HelpCircle, Home, Send, Menu, BookTemplate } from "lucide-react"
+import { HelpCircle, Home, Send, Menu, BookTemplate, Heart } from "lucide-react"
 import { NavItem } from "@/components/nav-item"
 
 export function ComposerSidebar() {
@@ -53,6 +53,9 @@ export function ComposerSidebar() {
         </NavItem>
         <NavItem href="/templates" icon={<BookTemplate className="h-4 w-4" />} active={pathname === "/templates"}>
           Templates
+        </NavItem>
+        <NavItem href="/favorites" icon={<Heart className="h-4 w-4" />} active={pathname === "/favorites"}>
+          Favorites
         </NavItem>
       </nav>
     </div>
