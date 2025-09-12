@@ -52,8 +52,8 @@ export default function DraftsPage() {
     fetchDrafts();
   }, []);
 
-  const filteredDrafts = drafts
-    .filter((draft) => {
+  const filteredDrafts = 
+  drafts.filter((draft) => {
       const matchesSearch =
         draft.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
         draft.to.toLowerCase().includes(searchQuery.toLowerCase());
