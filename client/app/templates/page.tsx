@@ -35,7 +35,7 @@ export default function Draft() {
             window.location.href = "/profile"
           }}
         />
-        <div className="p-6">
+        <div className="p-6 overflow-scroll h-[calc(100vh-4rem)]">
           <TemplatesPage />
         </div>
       </div>

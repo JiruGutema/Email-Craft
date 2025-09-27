@@ -47,12 +47,21 @@ export default function DraftsPage() {
   useEffect(() => {
     const fetchDrafts = async () => {
       const drafts = await getDrafts(getToken() || "");
+      if( drafts.status === 401) {
+        toast({
+          description: "Session expired. Please logout and then login.",
+        });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+      }
       setDrafts(await drafts.json());
     };
     fetchDrafts();
   }, []);
-
-  const filteredDrafts = 
+let filteredDrafts: Draft[] = [];
+if (drafts.length > 0) {
+   filteredDrafts = 
   drafts.filter((draft) => {
       const matchesSearch =
         draft.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -70,7 +79,7 @@ export default function DraftsPage() {
           return 0;
       }
     });
-
+  }
   const handleEdit = (to: string, subject: string, body: string) => {
     const draft = {
       to,
