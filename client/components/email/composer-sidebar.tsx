@@ -81,7 +81,7 @@ export function ComposerSidebar() {
         {/* Mobile menu button - fixed at top left */}
         <button
           onClick={() => setOpen(true)}
-          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded bg-white border shadow hover:bg-gray-100 focus:outline-none"
+          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded bg-white border hover:bg-gray-100 focus:outline-none"
           aria-label="Open sidebar"
         >
           <Menu className="h-6 w-6" />
@@ -101,7 +101,7 @@ export function ComposerSidebar() {
               onClick={() => setOpen(false)}
             />
             {/* Drawer */}
-            <div className="relative w-64 bg-white border-r h-full flex flex-col z-50">
+            <div className="pt-10 relative w-64 bg-white border-r h-full flex flex-col z-50">
               <button
                 onClick={() => setOpen(false)}
                 className="absolute top-2 right-2 p-2 rounded hover:bg-gray-100 focus:outline-none"
