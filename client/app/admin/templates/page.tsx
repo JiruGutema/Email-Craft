@@ -33,7 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { TemplateData } from "@/lib/types";
 import { ComposerSidebar } from "@/components/email/composer-sidebar";
 import { isAdmin } from "@/lib/auth";
-import Spinner from '@/components/spinner';
+import Spinner from "@/components/spinner";
 
 export default function TemplatesPage() {
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
@@ -63,173 +63,186 @@ export default function TemplatesPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [adminChecked, setAdminChecked] = useState(false);
+  // Helper to get token safely
+  const getTokenSafe = () =>
+    typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
-  useEffect(() => {
-    async function fetchCategories() {
+  // Helper to fetch and set categories
+  const fetchCategoriesAndSet = async () => {
+    try {
       const res = await getCategories();
-      const cats = await res.json();
+      const cats = await res.json().catch(() => []);
       setCategories(cats);
+    } catch (error) {
+      Logger.error("Failed to fetch categories:", error);
+      toast({
+        description: "Failed to load categories",
+        variant: "destructive",
+      });
     }
-    fetchCategories();
-  }, []);
+  };
 
-  useEffect(() => {
-    async function fetchTemplates() {
+  // Helper to fetch and set templates
+  const fetchTemplatesAndSet = async () => {
+    try {
       const res = await getTemplates();
-      const templates: TemplateData[] = await res.json();
+      const templates: TemplateData[] = await res.json().catch(() => []);
       setEmailTemplates(templates);
+    } catch (error) {
+      Logger.error("Failed to fetch templates:", error);
+      toast({
+        description: "Failed to load templates",
+        variant: "destructive",
+      });
     }
-    fetchTemplates();
+  };
+
+  // Initial load
+  useEffect(() => {
+    fetchCategoriesAndSet();
+  }, []);
+  useEffect(() => {
+    fetchTemplatesAndSet();
   }, []);
 
+  // Filtered data
   const filteredCategories = categories.filter((cat) =>
     cat.name.toLowerCase().includes(search.toLowerCase())
   );
-
   const filteredTemplates = emailTemplates.filter((template) =>
     template.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  // CRUD operations
+  const handleAddTemplate = async () => {
     try {
-      const res = await createTemplate(
-        { ...form, categoryId: selectedCategory },
-        getToken() || ""
-      );
-      Logger.log("Template created:", res);
-      if (res.status === 401) {
-        toast({
-          description: "Session expired. Please logout and then login.",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-        return;
-      }
-      if (res.status === 403) {
-        toast({
-          description: "You don't have permission to perform this action.",
-          variant: "destructive",
-        });
-
-        return;
-      }
-      if (!res.ok) {
-        throw new Error("Failed to create template");
-      }
-      toast({ description: "Template created successfully" });
-      // Reset form
+      await createTemplate(form, getTokenSafe());
+      setAddDialogOpen(false);
       setForm({
         title: "",
         description: "",
-        categoryId: "",
+        categoryId: "Newsletter",
         htmlContent: "",
         tags: [],
       });
-      setSelectedCategory("");
+      await fetchTemplatesAndSet();
+      toast({ description: "Template added successfully" });
     } catch (error) {
-      toast({
-        description: "Failed to create template",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
+      Logger.error("Failed to add template:", error);
+      toast({ description: "Failed to add template", variant: "destructive" });
     }
-  };
-
-  const handleAddTemplate = async () => {
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-    await createTemplate(form, token);
-    setAddDialogOpen(false);
-    setForm({
-      title: "",
-      description: "",
-      categoryId: "Newsletter",
-      htmlContent: "",
-      tags: [],
-    });
-    // Refresh templates
-    const res = await getTemplates();
-    const templates: TemplateData[] = await res.json();
-    setEmailTemplates(templates);
-  };
-  const handleUseTemplate = (body: string) => {
-    const draft = {
-      to: "",
-      subject: "Please customize subject",
-      body: body,
-    };
-    localStorage.setItem("composerFormCache", JSON.stringify(draft));
-    setTimeout(() => {
-      window.location.href = "/composer";
-    }, 500);
-    setPreviewOpen(false);
   };
 
   const handleUpdateTemplate = async () => {
     if (!selectedTemplate) return;
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-    await updateTemplate(selectedTemplate.id || "", form, token);
-    setEditDialogOpen(false);
-    setForm({
-      title: "",
-      description: "",
-      categoryId: "Newsletter",
-      htmlContent: "",
-      tags: [],
-    });
-    // Refresh templates
-    const res = await getTemplates();
-    const templates: TemplateData[] = await res.json();
-    setEmailTemplates(templates);
+    try {
+      await updateTemplate(selectedTemplate.id || "", form, getTokenSafe());
+      setEditDialogOpen(false);
+      setSelectedTemplate(null);
+      setForm({
+        title: "",
+        description: "",
+        categoryId: "Newsletter",
+        htmlContent: "",
+        tags: [],
+      });
+      await fetchTemplatesAndSet();
+      toast({ description: "Template updated successfully" });
+    } catch (error) {
+      Logger.error("Failed to update template:", error);
+      toast({
+        description: "Failed to update template",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteTemplate = async () => {
     if (!selectedTemplate) return;
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-    await deleteTemplate(selectedTemplate.id || "", token);
-    setDeleteDialogOpen(false);
-    setSelectedTemplate(null);
-    // Refresh templates
-    const res = await getTemplates();
-    const templates: TemplateData[] = await res.json();
-    setEmailTemplates(templates);
+    try {
+      await deleteTemplate(selectedTemplate.id || "", getTokenSafe());
+      setDeleteDialogOpen(false);
+      setSelectedTemplate(null);
+      await fetchTemplatesAndSet();
+      toast({ description: "Template deleted successfully" });
+    } catch (error) {
+      Logger.error("Failed to delete template:", error);
+      toast({
+        description: "Failed to delete template",
+        variant: "destructive",
+      });
+    }
   };
 
+  // Use template
+  const handleUseTemplate = (body: string) => {
+    const draft = { to: "", subject: "Please customize subject", body };
+    localStorage.setItem("composerFormCache", JSON.stringify(draft));
+    setPreviewOpen(false);
+    setTimeout(() => {
+      window.location.href = "/composer";
+    }, 500);
+  };
+
+  // Admin check
   useEffect(() => {
-    async function checkAdmin() {
-      const response = await isAdmin(getToken() || "");
-      if (response.status === 200) {
-        const isAdminResult = await response.json();
-        if (isAdminResult === false) {
-          window.location.href = "/";
-        }
-        if (isAdminResult) {
+    const checkAdmin = async () => {
+      try {
+        const response = await isAdmin(getTokenSafe());
+        const data = await response.json().catch(() => null);
+
+        if (response.status === 200) {
+          if (!data) {
+            toast({
+              description: "You don't have permission to access this page.",
+              variant: "destructive",
+            });
+            window.location.href = "/";
+            return;
+          }
           setIsAdminUser(true);
+        } else if ([401, 403].includes(response.status)) {
+          toast({
+            description: "Session expired. Please login again.",
+            variant: "destructive",
+          });
+          if (response.status === 403) {
+            toast({
+              description: "You don't have permission to access this page.",
+              variant: "destructive",
+            });
+          }
+          setTimeout(() => {
+            HandleLogout();
+          }, 3000);
+        } else {
+          Logger.error(
+            "Unexpected admin response:",
+            response.status,
+            response.statusText,
+            data
+          );
         }
+      } catch (error) {
+        Logger.error("Error checking admin:", error);
+        toast({
+          description: "Network error. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setAdminChecked(true);
       }
-      if (response.status === 401 || response.status === 403) {
-        toast({ description: "Session expired. Please login again.", variant: "destructive" });
-        if (response.status === 403) {
-          toast({ description: "You don't have permission to access this page.", variant: "destructive" });
-        }
-        setTimeout(() => {
-          HandleLogout();
-        }, 3000);
-      }
-      setAdminChecked(true);
-    }
+    };
+
     checkAdmin();
   }, []);
 
   if (!adminChecked) {
-    return <div className="flex h-screen items-center justify-center"><Spinner /></div>;
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
   if (!isAdminUser) {
     return null;
@@ -255,10 +268,7 @@ export default function TemplatesPage() {
                     className="w-64 pl-9"
                   />
                 </div>
-                <Button
-                  size="sm"
-                  onClick={() => setAddDialogOpen(true)}
-                >
+                <Button size="sm" onClick={() => setAddDialogOpen(true)}>
                   Add Template
                 </Button>
               </div>
@@ -360,7 +370,10 @@ export default function TemplatesPage() {
                       </Button>
                     </div>
 
-                    <TabsContent value="compose" style={{ height: "420px", overflow: "auto" }}>
+                    <TabsContent
+                      value="compose"
+                      style={{ height: "420px", overflow: "auto" }}
+                    >
                       <Editor
                         value={form.htmlContent}
                         onValueChange={(code) =>
@@ -432,23 +445,31 @@ export default function TemplatesPage() {
                 <Input
                   placeholder="Description"
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                   required
                 />
                 <Input
                   placeholder="Category"
                   value={form.categoryId}
-                  onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, categoryId: e.target.value })
+                  }
                   required
                 />
                 <Input
                   placeholder="Tags (comma separated)"
                   value={form.tags.join(",")}
-                  onChange={(e) => setForm({ ...form, tags: e.target.value.split(",") })}
+                  onChange={(e) =>
+                    setForm({ ...form, tags: e.target.value.split(",") })
+                  }
                 />
                 {/* HTML Editor & Preview for Edit Dialog */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Content</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Content
+                  </label>
                   <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <div className="flex items-center mb-2">
                       <TabsList className="flex flow-col gap-2">
@@ -479,7 +500,10 @@ export default function TemplatesPage() {
                         <ClipboardPaste className="h-8 w-8" />
                       </Button>
                     </div>
-                    <TabsContent value="compose" style={{ height: "420px", overflow: "auto" }}>
+                    <TabsContent
+                      value="compose"
+                      style={{ height: "420px", overflow: "auto" }}
+                    >
                       <Editor
                         value={form.htmlContent}
                         onValueChange={(code) =>
@@ -514,7 +538,8 @@ export default function TemplatesPage() {
                             style={{ overflow: "auto", maxHeight: "320px" }}
                             dangerouslySetInnerHTML={{
                               __html:
-                                form.htmlContent || '<p class="text-gray-500">No content to preview</p>',
+                                form.htmlContent ||
+                                '<p class="text-gray-500">No content to preview</p>',
                             }}
                           />
                         </div>

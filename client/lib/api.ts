@@ -10,63 +10,75 @@ export interface ApiOptions {
   token?: string;
 }
 
+// export async function apiFetch(
+//   endpoint: string,
+//   options: ApiOptions = {}
+// ): Promise<Response> {
+//   const baseUrl = ApiBaseUrl() || process.env.NEXT_PUBLIC_API_URL || "";
+//   const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+
+//   const headers: Record<string, string> = {
+//     'Content-Type': 'application/json',
+//     ...options.headers,
+//   };
+//   if (options.token) {
+//     headers['Authorization'] = `Bearer ${options.token}`;
+//   }
+
+//   const fetchOptions: RequestInit = {
+//     method: options.method || 'GET',
+//     headers,
+//   };
+//   if (options.body) {
+//     fetchOptions.body = JSON.stringify(options.body);
+//   }
+
+//   const res = await fetch(url, fetchOptions);
+
+//   return res;
+
+// }
+
 export async function apiFetch(
   endpoint: string,
   options: ApiOptions = {}
-): Promise<Response> {
+): Promise<any> {
   const baseUrl = ApiBaseUrl() || process.env.NEXT_PUBLIC_API_URL || "";
-  const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
+  const url = endpoint.startsWith("http") ? endpoint : `${baseUrl}${endpoint}`;
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...options.headers,
   };
   if (options.token) {
-    headers['Authorization'] = `Bearer ${options.token}`;
+    headers["Authorization"] = `Bearer ${options.token}`;
   }
 
   const fetchOptions: RequestInit = {
-    method: options.method || 'GET',
+    method: options.method || "GET",
     headers,
   };
   if (options.body) {
     fetchOptions.body = JSON.stringify(options.body);
   }
 
-  const res = await fetch(url, fetchOptions);
-  return res;
+  try {
+    const res = await fetch(url, fetchOptions);
 
+    if (!res.ok) {
+      // e.g. 401 Unauthorized, 404 Not Found, etc.
+      const errorText = await res.text().catch(() => "");
+      throw new Error(
+        `API error: ${res.status} ${res.statusText} - ${errorText}`
+      );
+    }
+
+    // parse JSON automatically if API always returns JSON
+    return res.json();
+  } catch (err) {
+    console.error("apiFetch error:", err);
+    throw err; // rethrow so caller can decide what to do
+  }
 }
 
-// Example usage:
-//
-// import { apiFetch } from "@/lib/api";
-//
-// async function getUserProfile() {
-//   const token = localStorage.getItem("token");
-//   const data = await apiFetch("/auth/me", {
-//     method: "GET",
-//     token,
-//   });
-//   return data;
-// }
-//
-// async function sendEmail(emailData) {
-//   const token = localStorage.getItem("token");
-//   const data = await apiFetch("/mail/send", {
-//     method: "POST",
-//     token,
-//     body: emailData,
-//   });
-//   return data;
-// }
-//
-// async function getWithCustomHeaders() {
-//   const data = await apiFetch("/some-endpoint", {
-//     method: "GET",
-//     headers: {
-//       "X-Custom-Header": "value",
-//     },
-//   });
-//   return data;
-// }
+
