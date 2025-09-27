@@ -8,6 +8,7 @@ import { toast } from "@/hooks/use-toast";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
+import { Logger } from "@/lib/utils";
 
 
 export default function CategoriesPage() {
@@ -19,71 +20,94 @@ export default function CategoriesPage() {
   const [form, setForm] = useState<{ name: string }>({ name: "" });
   const [selectedCategory, setSelectedCategory] = useState<{ id: string; name: string } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+// Fetch categories helper
+const fetchAndSetCategories = async () => {
+  try {
+    const res = await getCategories();
+    const cats = await res.json().catch(() => []);
+    setCategories(cats);
+  } catch (error) {
+    Logger.error("Error fetching categories:", error);
+    toast({
+      description: "Failed to load categories",
+      variant: "destructive",
+    });
+  }
+};
 
-  useEffect(() => {
-    async function fetchCategories() {
-      const res = await getCategories();
-      const cats = await res.json();
-      setCategories(cats);
-    }
-    fetchCategories();
-  }, []);
+// Initial load
+useEffect(() => {
+  fetchAndSetCategories();
+}, []);
 
-  const filteredCategories = categories.filter(cat =>
-    cat.name.toLowerCase().includes(search.toLowerCase())
-  );
+// Filtered categories
+const filteredCategories = categories.filter((cat) =>
+  cat.name.toLowerCase().includes(search.toLowerCase())
+);
 
-  const handleAddCategory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-      await createCategories(form, token);
-      setAddDialogOpen(false);
-      setForm({ name: "" });
-      // Refresh categories
-      const res = await getCategories();
-      const cats = await res.json();
-      setCategories(cats);
-    } catch (error) {
-      toast({ description: "Failed to create category", variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+// Common token getter
+const getTokenSafe = () =>
+  typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
-  const handleEditCategory = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCategory) return;
-    setIsSubmitting(true);
-    try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-      await createCategories({ name: form.name, id: selectedCategory.id }, token);
-      setEditDialogOpen(false);
-      setForm({ name: "" });
-      setSelectedCategory(null);
-      // Refresh categories
-      const res = await getCategories();
-      const cats = await res.json();
-      setCategories(cats);
-    } catch (error) {
-      toast({ description: "Failed to update category", variant: "destructive" });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+// Add category
+const handleAddCategory = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-  const handleDeleteCategory = async () => {
-    if (!selectedCategory) return;
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
-    await deleteCategory(selectedCategory.id, token);
+  try {
+    await createCategories(form, getTokenSafe());
+    setAddDialogOpen(false);
+    setForm({ name: "" });
+    await fetchAndSetCategories();
+    toast({ description: "Category added successfully" });
+  } catch (error) {
+    Logger.error("Failed to create category:", error);
+    toast({ description: "Failed to create category", variant: "destructive" });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+// Edit category
+const handleEditCategory = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!selectedCategory) return;
+  setIsSubmitting(true);
+
+  try {
+    await createCategories({ name: form.name, id: selectedCategory.id }, getTokenSafe());
+    setEditDialogOpen(false);
+    setForm({ name: "" });
+    setSelectedCategory(null);
+    await fetchAndSetCategories();
+    toast({ description: "Category updated successfully" });
+  } catch (error) {
+    Logger.error("Failed to update category:", error);
+    toast({ description: "Failed to update category", variant: "destructive" });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+// Delete category
+const handleDeleteCategory = async () => {
+  if (!selectedCategory) return;
+
+  setIsSubmitting(true);
+  try {
+    await deleteCategory(selectedCategory.id, getTokenSafe());
     setDeleteDialogOpen(false);
     setSelectedCategory(null);
-    // Refresh categories
-    const res = await getCategories();
-    const cats = await res.json();
-    setCategories(cats);
-  };
+    await fetchAndSetCategories();
+    toast({ description: "Category deleted successfully" });
+  } catch (error) {
+    Logger.error("Failed to delete category:", error);
+    toast({ description: "Failed to delete category", variant: "destructive" });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="flex h-screen bg-background text-foreground">

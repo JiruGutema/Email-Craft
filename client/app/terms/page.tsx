@@ -11,7 +11,7 @@ export default function TermsPage() {
             <Link href="/">
               <Button
                 variant="outline"
-                className="text-muted-foreground hover:text-foreground gap-2"
+                className="hover:bg-transparent text-muted-foreground hover:text-foreground gap-2"
               >
                 <ArrowLeft className="h-4 w-4" />
                 Back to App
@@ -31,7 +31,7 @@ export default function TermsPage() {
           </p>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               1. Acceptance of Terms
             </h2>
             <p className="text-sm mb-2">
@@ -42,7 +42,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               2. Service Description
             </h2>
             <p className="text-sm mb-2">
@@ -63,7 +63,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               3. User Accounts & Authentication
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm">
@@ -89,7 +89,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               4. Email Sending & Drafts
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm">
@@ -111,7 +111,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               5. Acceptable Use Policy
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm">
@@ -128,7 +128,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               6. Privacy Policy
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm">
@@ -169,7 +169,7 @@ export default function TermsPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-lg font-bold mb-2 text-accent">
+            <h2 className="text-lg font-bold mb-2 text-gray-600">
               7. Service Availability & Changes
             </h2>
             <ul className="list-disc pl-5 space-y-2 text-sm">
@@ -190,7 +190,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold mb-2 text-accent">8. Contact</h2>
+            <h2 className="text-lg font-bold mb-2 text-gray-600">8. Contact</h2>
             <p className="text-sm">
               If you have any questions or concerns about these terms or your
               privacy, please contact us at{" "}
@@ -210,7 +210,7 @@ export default function TermsPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <img src={'./images/logo.png'} className="h-6 w-6 text-accent" />
+              <img src={'./images/logo.png'} className="h-6 w-6 text-gray-600" />
               <span className="text-lg font-semibold">Email Craft</span>
             </div>
             <p className="text-muted-foreground text-sm">

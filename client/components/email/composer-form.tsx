@@ -21,91 +21,96 @@ export function ComposerForm() {
   const [activeTab, setActiveTab] = useState("compose");
   const [isSending, setIsSending] = useState(false);
 
-  // Load cached form data on mount
-  useEffect(() => {
-    const cached = localStorage.getItem("composerFormCache");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        setEmailData({ ...defaultEmailData, ...parsed });
-      } catch {
-        setEmailData(defaultEmailData);
-      }
-    } else {
+// Load cached form data on mount
+useEffect(() => {
+  const cached = localStorage.getItem("composerFormCache");
+  if (cached) {
+    try {
+      const parsed = JSON.parse(cached);
+      setEmailData({ ...defaultEmailData, ...parsed });
+    } catch {
       setEmailData(defaultEmailData);
     }
-  }, []);
-  {
-    toast;
+  } else {
+    setEmailData(defaultEmailData);
   }
-  // Cache form data on change, but only if not empty
-  useEffect(() => {
-    // Only cache if at least one field is non-empty
-    if (emailData.to || emailData.subject || emailData.body) {
-      localStorage.setItem("composerFormCache", JSON.stringify(emailData));
+}, []);
+
+// Cache form data on change, but only if not empty
+useEffect(() => {
+  if (emailData.to || emailData.subject || emailData.body) {
+    localStorage.setItem("composerFormCache", JSON.stringify(emailData));
+  }
+}, [emailData]);
+
+const handleSessionExpired = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+  toast({
+    description: "Session expired. Please log in again.",
+    variant: "destructive",
+  });
+  setTimeout(() => {
+    window.location.href = "/login";
+  }, 3000);
+};
+
+const handleSendEmail = async () => {
+  setIsSending(true);
+  try {
+    const response = await sendEmail(emailData, getToken() || "");
+    const resData = await response.json().catch(() => null);
+
+    if (response.status === 401) {
+      handleSessionExpired();
+      return;
     }
-  }, [emailData]);
 
-  const handleSendEmail = async () => {
-    setIsSending(true);
-    try {
-      const response = await sendEmail(emailData, getToken() || "");
-      if (response.status === 401) {
-        toast({
-          description: "Session expired. Please logout and then login.",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      }
-
-      if (response.ok) {
-        toast({description: "Email sent successfully" });
-        setEmailData(defaultEmailData);
-        localStorage.removeItem("composerFormCache"); // Clear cache on success
-      } else {
-        if(response.status === 401) {
-          HandleLogout();
-          const resData = await response.json();
-          toast({description: "Session Expired, Please login again!", variant: "destructive" });
-        }else {
-          toast({description: "Failed to send email", variant: "destructive" });
-        }
-        Logger.error("Failed to send email");
-      }
-      Logger.log(await response.json())
-    } catch (error) {
-      Logger.error("Error sending email:", error);
-    } finally {
-      setIsSending(false);
-    }
-  };
-
-  const handleSaveDraft = async () => {
-    if (emailData.to || emailData.subject || emailData.body) {
-      try {
-        const response = await saveDraft(emailData, getToken() || "");
-        if (response.status === 401) {
-          toast({
-            title: "Login Success",
-            description: "Unauthorized access. Please log in.",
-          });
-          setTimeout(() => {
-            window.location.href = "/login";
-          }, 3000);
-        } else if (response.ok) {
-          Logger.log(await response.json());
-          toast({ title: "", description: "Draft saved successfully" });
-        } else {
-          toast({ title: "Error", description: "Failed to save draft" });
-        }
-      } catch (error) {
-        Logger.error("Error saving draft:", error);
-      }
+    if (response.ok) {
+      toast({ description: "Email sent successfully" });
+      setEmailData(defaultEmailData);
+      localStorage.removeItem("composerFormCache");
     } else {
-      toast({ title: "", description: "No changes to save" });
+      Logger.error("Failed to send email:", response.status, response.statusText);
+      toast({ description: "Failed to send email", variant: "destructive" });
     }
-  };
+
+    Logger.log(resData);
+  } catch (error) {
+    Logger.error("Error sending email:", error);
+    toast({ description: "An error occurred. Please try again.", variant: "destructive" });
+  } finally {
+    setIsSending(false);
+  }
+};
+
+const handleSaveDraft = async () => {
+  if (!emailData.to && !emailData.subject && !emailData.body) {
+    toast({ description: "No changes to save" });
+    return;
+  }
+
+  try {
+    const response = await saveDraft(emailData, getToken() || "");
+    const resData = await response.json().catch(() => null);
+
+    if (response.status === 401) {
+      handleSessionExpired();
+      return;
+    }
+
+    if (response.ok) {
+      Logger.log(resData);
+      toast({ description: "Draft saved successfully" });
+    } else {
+      Logger.error("Failed to save draft:", response.status, response.statusText);
+      toast({ description: "Failed to save draft", variant: "destructive" });
+    }
+  } catch (error) {
+    Logger.error("Error saving draft:", error);
+    toast({ description: "An error occurred. Please try again.", variant: "destructive" });
+  }
+};
 
   return (
     <div className="max-w-4xl mx-auto bg-background text-foreground">

@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, Eye, Download, ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
+import { toast } from "@/hooks/use-toast";
 
 interface EmailTemplate {
   id: string;
@@ -29,9 +29,37 @@ interface EmailTemplate {
 }
 
 const categories = await (async function fetchCategories() {
+  try {
     const res = await getCategories();
-    const categories = await res.json();
-    return categories;
+
+    if (res.status === 401) {
+      toast({
+        description: "Session expired. Please log in again.",
+      });
+      setTimeout(() => {
+        window.location.href = "/login";
+      }, 3000);
+      return [];
+    }
+
+    if (!res.ok) {
+      toast({
+        description: "Failed to load categories",
+        variant: "destructive",
+      });
+      return [];
+    }
+
+    // success case
+    return await res.json();
+  } catch (err) {
+    console.error("Network error fetching categories:", err);
+    toast({
+      description: "Network error. Please try again later.",
+      variant: "destructive",
+    });
+    return [];
+  }
 })();
 
 export default function FavoritesPage() {
@@ -42,14 +70,51 @@ export default function FavoritesPage() {
   const [previewOpen, setPreviewOpen] = useState(false);
 
   useEffect(() => {
-    async function fetchTemplates() {
-      const res = await getTemplates();
-      const templates: EmailTemplate[] = await res.json();
-      setEmailTemplates(templates);
-    }
-    fetchTemplates();
-  }, []);
+  let ignore = false; // prevent state updates if unmounted
 
+  async function fetchTemplates() {
+    try {
+      const res = await getTemplates();
+
+      if (res.status === 401) {
+        toast({
+          description: "Session expired. Please log in again.",
+        });
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 3000);
+        return;
+      }
+
+      if (!res.ok) {
+        toast({
+          description: "Failed to load templates",
+          variant: "destructive",
+        });
+        if (!ignore) setEmailTemplates([]);
+        return;
+      }
+
+      // success case
+      const templates: EmailTemplate[] = await res.json();
+      if (!ignore) setEmailTemplates(templates);
+
+    } catch (err) {
+      console.error("Network error fetching templates:", err);
+      toast({
+        description: "Network error. Please try again later.",
+        variant: "destructive",
+      });
+      if (!ignore) setEmailTemplates([]);
+    }
+  }
+
+  fetchTemplates();
+
+  return () => {
+    ignore = true; // cleanup on unmount
+  };
+}, []);
   const filteredTemplates = emailTemplates.filter((template) => {
     const matchesCategory = selectedCategory === "All" || template.categoryId === selectedCategory;
     const matchesSearch =

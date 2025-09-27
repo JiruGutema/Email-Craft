@@ -36,7 +36,7 @@ export default function Favorites() {
           }}
         />
 
-        <div className="p-6">
+        <div className="p-6 overflow-scroll h-[calc(100vh-4rem)]">
           <FavoritesPage />
         </div>
       </div>

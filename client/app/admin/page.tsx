@@ -7,9 +7,10 @@ import { ComposerSidebar } from "@/components/email/composer-sidebar";
 import Spinner from "@/components/spinner";
 import { toast } from "@/hooks/use-toast";
 import { isAdmin } from "@/lib/auth";
-import { AuthGuard, getToken, HandleLogout } from "@/lib/utils";
+import { AuthGuard, getToken, HandleLogout, Logger } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { set } from "react-hook-form";
 
 export default function Draft() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,27 +18,33 @@ export default function Draft() {
   const [adminChecked, setAdminChecked] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const auth = AuthGuard();
-    setIsAuthenticated(auth);
-    if (!auth) {
-      router.replace("/login");
-    }
-  }, [router]);
+useEffect(() => {
+  const auth = AuthGuard();
+  setIsAuthenticated(auth);
 
-  useEffect(() => {
-    async function checkAdmin() {
+  if (!auth) {
+    router.replace("/login");
+  }
+}, [router]);
+
+useEffect(() => {
+  const checkAdmin = async () => {
+    try {
       const response = await isAdmin(getToken() || "");
+      const data = await response.json().catch(() => null);
+
       if (response.status === 200) {
-        const isAdminResult = await response.json();
-        if (isAdminResult === false) {
+        // data expected to be true/false
+        if (!data) {
+          toast({
+            description: "You don't have permission to access this page.",
+            variant: "destructive",
+          });
           window.location.href = "/";
+          return;
         }
-        if (isAdminResult) {
-          setIsAdminUser(true);
-        }
-      }
-      if (response.status === 401 || response.status === 403) {
+        setIsAdminUser(true);
+      } else if ([401, 403].includes(response.status)) {
         toast({
           description: "Session expired. Please login again.",
           variant: "destructive",
@@ -51,11 +58,23 @@ export default function Draft() {
         setTimeout(() => {
           HandleLogout();
         }, 3000);
+      } else {
+        Logger.error("Unexpected admin check response:", response.status, response.statusText, data);
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
       }
+    } catch (error) {
+      Logger.error("Error checking admin:", error);
+        window.location.href = "/";
+    } finally {
       setAdminChecked(true);
     }
-    checkAdmin();
-  }, []);
+  };
+
+  checkAdmin();
+}, []);
+
 
   if (!isAuthenticated || !adminChecked) {
     return (

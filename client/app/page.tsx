@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { toast } from "@/hooks/use-toast"
 import { subscribe } from "@/lib/subscribe"
-import { AuthGuard } from "@/lib/utils"
+import { AuthGuard, Logger } from "@/lib/utils"
 import { Edit3, User, Shield, Star, ArrowRight, MoonStar } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -26,23 +26,40 @@ export default function Home() {
     checkAuth();
   }, []);
 
-  const handleSubscription = async (email: string) => {
-    // validate for email first check it's validity format and so on
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      toast({ description: "Please enter a valid email address.", variant: "destructive" });
-      return;
-    }
+const handleSubscription = async (email: string) => {
+  // Validate email format
+  if (!/\S+@\S+\.\S+/.test(email)) {
+    toast({
+      description: "Please enter a valid email address.",
+      variant: "destructive",
+    });
+    return;
+  }
 
-    let res = (await subscribe(email));
+  try {
+    const res = await subscribe(email);
+    const data = await res.json().catch(() => null); // safe fallback if response is empty
 
-    if(res.ok){
-      const data = await res.json();
-      toast({ description: data.message, variant: "default" });
+    if (res.ok) {
+      toast({
+        description: data?.message || "Subscribed successfully!",
+        variant: "default",
+      });
+    } else {
+      Logger.error("Subscription failed:", res.status, res.statusText, data);
+      toast({
+        description: data?.message || "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
     }
-    else{
-      toast({ description: "Something went wrong. Please try again later.", variant: "destructive" });
-    }
-  };
+  } catch (error) {
+    Logger.error("Network error during subscription:", error);
+    toast({
+      description: "Network error. Please try again later.",
+      variant: "destructive",
+    });
+  }
+};
 
   return (
     <div className="min-h-screen bg-background">
