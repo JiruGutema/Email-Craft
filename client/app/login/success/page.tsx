@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/spinner";
 
-
-
 export default function LoginSuccess() {
   const router = useRouter();
 
