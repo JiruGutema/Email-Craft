@@ -60,12 +60,12 @@ export class AuthController {
 
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  @Redirect('http://localhost:3001/login/success', 302)
+  @Redirect(`${process.env.CLIENT_RID_URL}/login/success`, 302)
   async googleAuthRedirect(@Request() req) {
     const payload = { username: req.user.username, sub: req.user.id, role: req.user.role };
     const token = await this.jwtService.signAsync(payload);
     return {
-      url: `http://localhost:3001/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
+      url: `${process.env.CLIENT_RID_URL}/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
     };
   }
 
