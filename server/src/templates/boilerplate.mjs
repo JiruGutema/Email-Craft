@@ -172,16 +172,6 @@ const emailTemplates = [
   },
 ];
 
-function seedTemplates() {
-  emailTemplates.forEach(async (template) => {
-    template.categoryId = '8c78f111-1937-4f9d-889f-063157938f6a';
-    let createdTemplate = await prisma.emailTemplates.create({
-      data: template,
-    });
-    console.log(`Created template with ID: ${createdTemplate.id}`);
-  });
-}
-
 
 const Mini = [
   {
@@ -439,7 +429,17 @@ function seedWelcomeTemplates() {
     console.log(`Created welcome template with ID: ${createdTemplate.id}`);
   });
 }
+function seedTemplates() {
+  emailTemplates.forEach(async (template) => {
+    template.categoryId = '8c78f111-1937-4f9d-889f-063157938f6a';
+    let createdTemplate = await prisma.emailTemplates.create({
+      data: template,
+    });
+    console.log(`Created template with ID: ${createdTemplate.id}`);
+  });
+}
+
 
 seedWelcomeTemplates();
-// seedTemplates();
+seedTemplates();
 
