@@ -418,11 +418,11 @@ const welcomeTemplates = [
 ];
 
 
-
+const id = '745a4495-78b3-4db5-9bbe-3b622e00fe30'
 
 function seedWelcomeTemplates() {
   welcomeTemplates.forEach(async (template) => {
-    template.categoryId = 'b229b57d-4bcd-4aad-b50a-1e0db082039b';
+    template.categoryId = id;
     let createdTemplate = await prisma.emailTemplates.create({
       data: template,
     });
@@ -431,7 +431,7 @@ function seedWelcomeTemplates() {
 }
 function seedTemplates() {
   emailTemplates.forEach(async (template) => {
-    template.categoryId = '8c78f111-1937-4f9d-889f-063157938f6a';
+    template.categoryId = id;
     let createdTemplate = await prisma.emailTemplates.create({
       data: template,
     });

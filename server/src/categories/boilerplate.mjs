@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-const category = "Welcome";
+const category = "All";
 
 async function seedTemplates() {
     let createdTemplate = await prisma.templateCategories.create({
@@ -12,6 +12,6 @@ async function seedTemplates() {
     console.log(`Created template with ID: ${createdTemplate.id}`);
   };
 
-// seedTemplates();
-console.log(await prisma.templateCategories.findMany());
+seedTemplates();
+// console.log(await prisma.templateCategories.findMany());
 
