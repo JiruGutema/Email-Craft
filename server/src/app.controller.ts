@@ -21,7 +21,7 @@ export class AppController {
     }
   })
 
-  health(): string {
+  health() {
     return this.appService.health();
   }
 }

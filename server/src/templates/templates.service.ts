@@ -3,6 +3,7 @@ import { CreateTemplateDto } from './dto/create-template.dto';
 import { UpdateTemplateDto } from './dto/update-template.dto';
 import { PrismaClient } from '@prisma/client';
 import { NotFoundError } from 'rxjs';
+import { Logger } from 'src/utils/utils';
 
 const prisma = new PrismaClient();
 @Injectable()
@@ -24,12 +25,25 @@ export class TemplatesService {
     return template;
   }
 
-  async findAll() {
-    const templates = await prisma.emailTemplates.findMany();
-    if (!templates) {
+  async findAll(userId: string) {
+    const templates = await prisma.emailTemplates.findMany({
+      include: {
+        favorites: {
+          where: { userId },
+          select: { id: true },
+        },
+      },
+    });
+
+    if (!templates || templates.length === 0) {
       throw new NotFoundException('No templates found');
     }
-    return templates;
+    return templates.map((template) => ({
+      ...template,
+      isFavorite:
+        Array.isArray(template.favorites) && template.favorites?.length > 0,
+      favorites: template.favorites ?? [],
+    }));
   }
 
   async findOne(id: string) {
@@ -38,8 +52,6 @@ export class TemplatesService {
     });
     return template;
   }
-
-
 
   async update(id: string, updateTemplateDto: UpdateTemplateDto) {
     const findTemplate = await prisma.emailTemplates.findUnique({
@@ -81,36 +93,43 @@ export class TemplatesService {
   }
 
   async favoriteTemplate(userId: string, templateId: string) {
-    const findTemplate = await prisma.emailTemplates.findUnique({
+    // Check if template exists
+    const template = await prisma.emailTemplates.findUnique({
       where: { id: templateId },
     });
-    if (!findTemplate) {
+    if (!template) {
       throw new NotFoundException('Template not found');
     }
 
+    // Check if already favorited
     const alreadyFavorited = await prisma.favorites.findFirst({
-      where: {
-        userId,
-        templateId,
-      },
+      where: { userId, templateId },
     });
-
     if (alreadyFavorited) {
-      throw new Error('Template already favorited');
+      await prisma.favorites.deleteMany({
+      where: { userId, templateId },
+      });
+    return {
+      message: 'Template unfavorited successfully',
+    };
     }
 
+    // Create favorite
     const favorite = await prisma.favorites.create({
       data: {
-        userId,
         templateId,
+        userId,
       },
+      include: { template: true },
     });
 
     if (!favorite) {
       throw new Error('Error favoriting template');
     }
 
-    return favorite;
+    return {
+      message: 'Template favorited successfully',
+    };
   }
 
   async unfavoriteTemplate(userId: string, templateId: string) {
@@ -151,11 +170,10 @@ export class TemplatesService {
       where: { userId },
       include: { template: true },
     });
-
-    if (!favorites) {
-      throw new NotFoundException('No favorites found for this user');
-    }
-
-    return favorites.map(fav => fav.template);
+    // Extract only the templates from the favorites
+    const favoriteTemplates = favorites
+      .map(fav => fav.template)
+      .filter(template => !!template);
+    return favoriteTemplates;
   }
 }
