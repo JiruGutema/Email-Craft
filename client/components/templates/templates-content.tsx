@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,21 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Download, ArrowLeft } from "lucide-react";
+import { Search, Eye, Download, ArrowLeft, Heart } from "lucide-react";
 import Link from "next/link";
 import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
 import { toast } from "@/hooks/use-toast";
+import Spinner from "../spinner";
+import { getToken, Logger } from "@/lib/utils";
+import { TemplateData } from "@/lib/types";
+import { addFavorite } from "@/lib/favourite";
 
-interface EmailTemplate {
-  id: string;
-  title: string;
-  description: string;
-  categoryId: string;
-  thumbnail?: string;
-  htmlContent: string;
-  tags: string[];
-}
 const categories = await (async function fetchCategories() {
   try {
     const res = await getCategories();
@@ -63,66 +57,70 @@ const categories = await (async function fetchCategories() {
 })();
 
 export default function TemplatesPage() {
-  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([]);
+  const [emailTemplates, setEmailTemplates] = useState<TemplateData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateData | null>(
+    null
+  );
   const [previewOpen, setPreviewOpen] = useState(false);
-  
-useEffect(() => {
-  let ignore = false; // prevent state updates if unmounted
+  const [loading, setLoading] = useState(true);
 
-  async function fetchTemplates() {
-    try {
-      const res = await getTemplates();
+  useEffect(() => {
+    let ignore = false; // prevent state updates if unmounted
 
-      if (res.status === 401) {
+    async function fetchTemplates() {
+      try {
+        const res = await getTemplates(getToken() || "");
+        if (res.status === 401) {
+          toast({
+            description: "Session expired. Please log in again.",
+          });
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+          return;
+        }
+
+        if (!res.ok) {
+          toast({
+            description: "Failed to load templates",
+            variant: "destructive",
+          });
+          if (!ignore) setEmailTemplates([]);
+          return;
+        }
+
+        // success case
+        let templates = await res.json();
+        if (!ignore) setEmailTemplates(templates);
+        setLoading(false);
+      } catch (err) {
+        console.error("Network error fetching templates:", err);
         toast({
-          description: "Session expired. Please log in again.",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-        return;
-      }
-
-      if (!res.ok) {
-        toast({
-          description: "Failed to load templates",
+          description: "Network error. Please try again later.",
           variant: "destructive",
         });
         if (!ignore) setEmailTemplates([]);
-        return;
       }
-
-      // success case
-      const templates: EmailTemplate[] = await res.json();
-      if (!ignore) setEmailTemplates(templates);
-
-    } catch (err) {
-      console.error("Network error fetching templates:", err);
-      toast({
-        description: "Network error. Please try again later.",
-        variant: "destructive",
-      });
-      if (!ignore) setEmailTemplates([]);
     }
-  }
 
-  fetchTemplates();
+    fetchTemplates();
 
-  return () => {
-    ignore = true; // cleanup on unmount
-  };
-}, []);
-
+    return () => {
+      ignore = true; // cleanup on unmount
+    };
+  }, []);
 
   const filteredTemplates = emailTemplates.filter((template) => {
-    const matchesCategory = selectedCategory === "All" || template.categoryId === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "All" || template.categoryId === selectedCategory;
     const matchesSearch =
       template.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+      template.tags.some((tag) =>
+        tag.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     return matchesCategory && matchesSearch;
   });
 
@@ -139,13 +137,16 @@ useEffect(() => {
     setPreviewOpen(false);
   };
 
-  return (
+  if (loading) {
+    return <Spinner />;
+  }
 
+  return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className=" top-0 z-40 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
-        <div></div> 
+          <div></div>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -163,26 +164,26 @@ useEffect(() => {
       <div className="container mx-auto px-4 py-8">
         {/* Category Filters */}
         <div className="flex flex-wrap gap-2 mb-8">
+          <Button
+            key="All"
+            variant={selectedCategory === "All" ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCategory("All")}
+            className="rounded-full"
+          >
+            All
+          </Button>
+          {categories.map((category: { id: string; name: string }) => (
             <Button
-                key="All"
-                variant={selectedCategory === "All" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCategory("All")}
-                className="rounded-full"
+              key={category.id}
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedCategory(category.id)}
+              className="rounded-full"
             >
-                All
+              {category.name}
             </Button>
-            {categories.map((category: { id: string; name: string }) => (
-                <Button
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category.id)}
-                    className="rounded-full"
-                >
-                    {category.name}
-                </Button>
-            ))}
+          ))}
         </div>
 
         {/* Templates Grid */}
@@ -198,14 +199,85 @@ useEffect(() => {
                   <div
                     className="w-full h-full overflow-auto bg-white border border-border rounded-t-lg"
                     dangerouslySetInnerHTML={{
-                      __html: template.htmlContent || "<p>No preview available</p>",
+                      __html:
+                        template.htmlContent || "<p>No preview available</p>",
                     }}
                   />
+
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 flex items-center justify-center">
                     <Dialog
                       open={previewOpen && selectedTemplate?.id === template.id}
                       onOpenChange={setPreviewOpen}
                     >
+                      <button
+                        className={
+                          "absolute top-4 right-4 p-2 bg-transparent transition " +
+                          (template.isFavorite ? "text-green-700 " : "text-red-600")
+                        }
+                        style={{ zIndex: 10 }}
+                        onClick={async () => {
+                          try {
+                            if (!template.id) {
+                              toast({
+                                description: "Invalid template ID.",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+
+                            const res = await addFavorite(template.id, getToken() || "");
+                            if (res.status === 401) {
+                              toast({
+                                description: "Session expired. Please log in again.",
+                              });
+                              setTimeout(() => {
+                                window.location.href = "/login";
+                              }, 3000);
+                              return;
+                            }
+
+                            if (!res.ok) {
+                              toast({
+                                description: "Failed to update favorites.",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+
+                            const data = await res.json();
+
+                            toast({
+                              description: data.message,
+                              variant:
+                                data.message === "Template unfavorited successfully"
+                                  ? "destructive"
+                                  : "default",
+                            });
+
+                            setEmailTemplates((prev) =>
+                              prev.map((t) =>
+                                t.id === template.id
+                                  ? {
+                                      ...t,
+                                      isFavorite: data.message !== "Template unfavorited successfully",
+                                    }
+                                  : t
+                              )
+                            );
+                          } catch (error) {
+                            console.error("Error toggling favorite:", error);
+                            toast({
+                              description: "Failed to update favorite.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        <Heart
+                          className="icon w-8 h-8"
+                          fill={template.isFavorite ? "#15803d" : "white"}
+                        />
+                      </button>
                       <DialogTrigger asChild>
                         <Button
                           variant="secondary"
@@ -225,7 +297,93 @@ useEffect(() => {
                         </DialogHeader>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
                           <div>
-                            <h3 className="font-medium mb-2">Preview</h3>
+                            <div className="flex items-center justify-between mb-2">
+                              <h3 className="font-medium mb-2">Preview</h3>
+                              <button
+                                className={
+                                  "p-2 bg-transparent transition " +
+                                  (template.isFavorite
+                                    ? "text-green-700 "
+                                    : "text-red-600")
+                                }
+                                onClick={async () => {
+                                  try {
+                                    if (!template.id) {
+                                      toast({
+                                        description: "Invalid template ID.",
+                                        variant: "destructive",
+                                      });
+                                      return;
+                                    }
+
+                                    const res = await addFavorite(
+                                      template.id,
+                                      getToken() || ""
+                                    );
+                                    if (res.status === 401) {
+                                      toast({
+                                        description:
+                                          "Session expired. Please log in again.",
+                                      });
+                                      setTimeout(() => {
+                                        window.location.href = "/login";
+                                      }, 3000);
+                                      return;
+                                    }
+
+                                    if (!res.ok) {
+                                      toast({
+                                        description:
+                                          "Failed to update favorites.",
+                                        variant: "destructive",
+                                      });
+                                      return;
+                                    }
+
+                                    const data = await res.json();
+
+                                    toast({
+                                      description: data.message,
+                                      variant:
+                                        data.message ===
+                                        "Template unfavorited successfully"
+                                          ? "destructive"
+                                          : "default",
+                                    });
+
+                                    // ✅ Update the local array of templates
+                                    setEmailTemplates((prev) =>
+                                      prev.map((t) =>
+                                        t.id === template.id
+                                          ? {
+                                              ...t,
+                                              isFavorite:
+                                                data.message !==
+                                                "Template unfavorited successfully",
+                                            }
+                                          : t
+                                      )
+                                    );
+                                  } catch (error) {
+                                    console.error(
+                                      "Error toggling favorite:",
+                                      error
+                                    );
+                                    toast({
+                                      description: "Failed to update favorite.",
+                                      variant: "destructive",
+                                    });
+                                  }
+                                }}
+                              >
+                                <Heart
+                                  className="icon w-8 h-8"
+                                  fill={
+                                    template.isFavorite ? "#15803d" : "white"
+                                  } // green if favorite, white otherwise
+                                />
+                              </button>
+                            </div>
                             <div
                               className="border rounded-lg p-4 bg-muted max-h-96 overflow-y-auto"
                               dangerouslySetInnerHTML={{
@@ -264,7 +422,9 @@ useEffect(() => {
                               </div>
                               <div className="flex gap-2 pt-4">
                                 <Button
-                                  onClick={() => handleUseTemplate(template.htmlContent)}
+                                  onClick={() =>
+                                    handleUseTemplate(template.htmlContent)
+                                  }
                                   className="flex-1"
                                 >
                                   Use Template
@@ -288,7 +448,6 @@ useEffect(() => {
                     <h3 className="font-medium text-foreground group-hover:text-primary transition-colors">
                       {template.title}
                     </h3>
-                    
                   </div>
                   <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                     {template.description}
@@ -317,7 +476,7 @@ useEffect(() => {
           ))}
         </div>
 
-        {filteredTemplates.length === 0 && (
+        {filteredTemplates.length === 0 && !loading && (
           <div className="text-center py-12">
             <div className="text-muted-foreground mb-4">
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
