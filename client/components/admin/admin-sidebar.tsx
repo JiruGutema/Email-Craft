@@ -89,7 +89,7 @@ export function AdminSidebar() {
         </NavItem>
         {(() => {
           const user = getLocalUser();
-          if (user.role === "admin") {
+          if (user && user.role && user.role === "admin") {
             return (
               <NavItem
                 href="/admin"
