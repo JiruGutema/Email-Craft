@@ -22,15 +22,7 @@ import { deleteDraft, getDrafts } from "@/lib/drafts";
 import { getToken, Logger } from "@/lib/utils";
 import { set } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
-
-interface Draft {
-  id: string;
-  to: string;
-  subject: string;
-  body: string;
-  createdAt: Date;
-  lastModified: Date;
-}
+import { Draft } from "@/lib/types";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -110,15 +102,6 @@ if (drafts.length > 0) {
     }, 3000);
   };
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(date);
-  };
-
   const stripHtml = (html: string) => {
     return html.replace(/<[^>]*>/g, "").substring(0, 120) + "...";
   };
@@ -182,7 +165,11 @@ if (drafts.length > 0) {
                     {/* Actions */}
                     <div className="flex items-center gap-2 mt-2 sm:mt-0 sm:ml-4 w-full sm:w-auto justify-between sm:justify-end">
                       <span className="text-xs text-muted-foreground">
-                        {formatDate(draft.lastModified)}
+                        {(() => {
+                          return draft.updatedAt instanceof Date
+                            ? draft.updatedAt.toLocaleString()
+                            : String(draft.updatedAt);
+                        })()}
                       </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

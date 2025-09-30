@@ -61,3 +61,12 @@ export interface CategoryData {
   name: string;
 }
 export type ViewType = "login" | "signup" | "composer" | "profile";
+export interface Draft {
+  id: string;
+  to: string;
+  subject: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+

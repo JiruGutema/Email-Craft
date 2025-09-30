@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Request, Req } from '@nestjs/common';
 import { DraftsService } from './drafts.service';
 import { CreateDraftDto } from './dto/create-draft.dto';
 import { UpdateDraftDto } from './dto/update-draft.dto';
@@ -17,14 +17,16 @@ export class DraftsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.draftsService.findAll();
+  findAll(@Req() req) {
+    const userId = req.user.userId;
+    return this.draftsService.findAll(userId);
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.draftsService.findOne(id);
+  findOne(@Param('id') id: string, @Req() req) {
+    const userId = req.user.userId;
+    return this.draftsService.findOne(id, userId);
   }
 
   @UseGuards(AuthGuard)

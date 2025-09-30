@@ -1,48 +1,55 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateDraftDto } from './dto/create-draft.dto';
 import { UpdateDraftDto } from './dto/update-draft.dto';
 import { PrismaClient } from '@prisma/client';
-import { Logger } from 'src/utils/utils';
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class DraftsService {
   async create(createDraftDto: CreateDraftDto, userId: string) {
-    const  subject = createDraftDto.subject;
-    const to = createDraftDto.to;
+    const { subject, to } = createDraftDto;
 
     const user = await prisma.users.findUnique({ where: { id: userId } });
-    const draft_Exist = await prisma.drafts.findFirst({ where: { subject, to } });
     if (!user) {
       throw new UnauthorizedException(`User with id ${userId} not found`);
     }
 
-    if (draft_Exist) {
-      throw new ForbiddenException(`Draft with subject "${subject}" and to "${to}" already exists`);
-    }
-
-    const draft = await prisma.drafts.create({
-      data: { ...createDraftDto, userId },
+    const existingDraft = await prisma.drafts.findFirst({
+      where: { subject, to, userId },
     });
-    if (draft) {
-      return draft;
-    } else {
-      throw new NotFoundException(`Failed to create draft`);
+    if (existingDraft) {
+      throw new ForbiddenException(
+        `Draft with subject "${subject}" and to "${to}" already exists`,
+      );
+    }
+
+    try {
+      return await prisma.drafts.create({
+        data: { ...createDraftDto, userId },
+      });
+    } catch (error) {
+      console.error('Error creating draft:', error);
+      throw new InternalServerErrorException('Failed to create draft');
     }
   }
 
-  async findAll() { //! Add Pagination to this page
-    const res = await prisma.drafts.findMany();
-    if (res) {
-      return res;
-    } else {
-      throw new NotFoundException(`No drafts found`);
+  async findAll(userId: string) {
+    const drafts = await prisma.drafts.findMany({ where: { userId } });
+    if (drafts.length === 0) {
+      throw new NotFoundException('No drafts found');
     }
+    return drafts;
   }
 
-  async findOne(id: string) {
-    const draft = await prisma.drafts.findUnique({ where: { id } });
+  async findOne(id: string, userId: string) {
+    const draft = await prisma.drafts.findFirst({ where: { id, userId } });
     if (!draft) {
       throw new NotFoundException(`Draft with id ${id} not found`);
     }
@@ -55,17 +62,21 @@ export class DraftsService {
       throw new NotFoundException(`Draft with id ${id} not found`);
     }
     if (draft.userId !== userId) {
-      throw new ForbiddenException(`You do not have permission to update this draft`);
+      throw new ForbiddenException(
+        `You do not have permission to update this draft`,
+      );
     }
-    const res =  await prisma.drafts.update({
-      where: { id },
-      data: updateDraftDto,
-    });
-    if(res){
-      return res;
-    }
-    else {
-      throw new NotFoundException(`Failed to update draft with id ${id}`);
+
+    try {
+      return await prisma.drafts.update({
+        where: { id },
+        data: updateDraftDto,
+      });
+    } catch (error) {
+      console.error('Error updating draft:', error);
+      throw new InternalServerErrorException(
+        `Failed to update draft with id ${id}`,
+      );
     }
   }
 
@@ -75,13 +86,19 @@ export class DraftsService {
       throw new NotFoundException(`Draft with id ${id} not found`);
     }
     if (draft.userId !== userId) {
-      throw new ForbiddenException(`You do not have permission to delete this draft`);
+      throw new ForbiddenException(
+        `You do not have permission to delete this draft`,
+      );
     }
-    const res = await prisma.drafts.delete({ where: { id } });
-    if (res) {
+
+    try {
+      await prisma.drafts.delete({ where: { id } });
       return { message: 'Draft deleted successfully' };
-    } else {
-      throw new NotFoundException(`Failed to delete draft with id ${id}`);
+    } catch (error) {
+      console.error('Error deleting draft:', error);
+      throw new InternalServerErrorException(
+        `Failed to delete draft with id ${id}`,
+      );
     }
   }
 }

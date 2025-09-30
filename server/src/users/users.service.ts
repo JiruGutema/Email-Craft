@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { SignupUserDto } from 'src/auth/dto/auth.dto';
 import * as bcrypt from 'bcrypt';
 const Prisma = new PrismaClient();
@@ -14,10 +14,7 @@ export class UsersService {
     new_user.password = hashedPassword;
     const existingUser = await Prisma.users.findMany({
       where: {
-        OR: [
-          { email: new_user.email },
-          { username: new_user.username },
-        ],
+        OR: [{ email: new_user.email }, { username: new_user.username }],
       },
     });
 
@@ -30,33 +27,32 @@ export class UsersService {
     return createdUser;
   }
 
- async findAll() {
+  async findAll() {
     return await Prisma.users.findMany();
-
   }
 
- async findOneById(id: string) {
+  async findOneById(id: string) {
     const user = await Prisma.users.findUnique({
       where: { id },
     });
-    if (!user){
+    if (!user) {
       return null;
     }
     return user;
   }
 
   async findOneByUsername(username: string) {
-    if (!username){
+    if (!username) {
       return null;
     }
-      const user = await Prisma.users.findUnique({
-        where: { username },
-      });
-      if (!user) {
-        return null;
-      }
-      return user;
+    const user = await Prisma.users.findUnique({
+      where: { username },
+    });
+    if (!user) {
+      return null;
     }
+    return user;
+  }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const user = await Prisma.users.findUnique({
@@ -70,7 +66,16 @@ export class UsersService {
       data: updateUserDto,
     });
 
-    return { message: 'User updated successfully', user: { id: updatedUser.id, username: updatedUser.username, email: updatedUser.email, name: updatedUser.name, picture: updatedUser.picture } };
+    return {
+      message: 'User updated successfully',
+      user: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        picture: updatedUser.picture,
+      },
+    };
   }
 
   async delete(userId: string) {
@@ -92,8 +97,11 @@ export class UsersService {
     });
   }
 
-  async updateGoogleTokens(userId: string, accessToken: string, refreshToken: string) {
-
+  async updateGoogleTokens(
+    userId: string,
+    accessToken: string,
+    refreshToken: string,
+  ) {
     if (!userId || !accessToken) {
       return null;
     }
@@ -104,22 +112,17 @@ export class UsersService {
         googleRefreshToken: refreshToken,
       },
     });
-    
   }
   async logout(userId: string) {
-
     if (!userId) {
       return null;
     }
-    await Prisma.users.update({
+    const res = await Prisma.users.update({
       where: { id: userId },
       data: {
         googleAccessToken: null,
         googleRefreshToken: null,
       },
     });
-    
   }
-
-
 }

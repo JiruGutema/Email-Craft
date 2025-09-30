@@ -102,12 +102,15 @@ const handleSubscription = async (email: string) => {
         </Button>
               {isAuthenticated ? (
               <Link href="/profile">
-                
-                <img
-                  src={`${user?.picture || "/default-profile.png"}`}
-                  alt="Profile"
-                  className="h-10 w-10 rounded-full border border-border"
-                />
+               {user?.picture ? (
+                 <img
+                   src={`${user?.picture || "/default-profile.png"}`}
+                   alt=""
+                   className="h-10 w-10 rounded-full border border-border"
+                 />
+               ) : (
+                 <User className="h-6 w-6 text-muted-foreground" />
+               )}
                 
               
               </Link>
