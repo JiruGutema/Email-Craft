@@ -1,16 +1,12 @@
 "use client";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import DraftsPage from "@/components/draft/drafts";
-import { ComposerForm } from "@/components/email/composer-form";
 import { ComposerHeader } from "@/components/email/composer-header";
-import { ComposerSidebar } from "@/components/email/composer-sidebar";
 import Spinner from "@/components/spinner";
 import { toast } from "@/hooks/use-toast";
 import { isAdmin } from "@/lib/auth";
 import { AuthGuard, getToken, HandleLogout, Logger } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { set } from "react-hook-form";
 
 export default function Draft() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

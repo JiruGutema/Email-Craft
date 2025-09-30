@@ -201,8 +201,7 @@ const handleSaveDraft = async () => {
                   borderRadius: 0,
                   border: "1px solid #e5e7eb",
                   color: "#333",
-                  // height: "400px",
-                  // overflow: "auto",
+    
                 }}
                 textareaId="html-editor"
                 textareaClassName="font-mono"

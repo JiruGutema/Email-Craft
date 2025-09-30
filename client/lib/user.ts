@@ -21,6 +21,13 @@ export async function deleteMe(token:string): Promise<Response> {
    });
 }
 
+export async function logout(token:string): Promise<Response> {
+  return apiFetch("/auth/logout", {
+    method: "POST",
+    token: token,
+  });
+}
+
 // Usage example elsewhere:
 // const response = await loginUser("user@example.com", "password123");
 // if (response.token) { localStorage.setItem("token", response.token); }
