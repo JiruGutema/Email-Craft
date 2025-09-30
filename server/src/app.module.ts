@@ -9,6 +9,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
 import { DraftsModule } from './drafts/drafts.module';
 import { TemplatesModule } from './templates/templates.module';
 import { CategoriesModule } from './categories/categories.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CategoriesModule } from './categories/categories.module';
     DraftsModule,
     TemplatesModule,
     CategoriesModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
