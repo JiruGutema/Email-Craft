@@ -8,7 +8,7 @@ The frontend provides a rich interface with live HTML editing, syntax highlighti
 
 ---
 
-## ✨ Features
+## Features
 
 - **Google OAuth Authentication:** Secure login with your Google account.
 - **JWT Authorization:** Protects API endpoints with JWT tokens.
@@ -22,7 +22,7 @@ The frontend provides a rich interface with live HTML editing, syntax highlighti
 
 ---
 
-## 🛠️ Technologies
+## Technologies
 
 - **NestJS** — Backend framework
 - **NextJS** — Frontend framework
@@ -33,7 +33,7 @@ The frontend provides a rich interface with live HTML editing, syntax highlighti
 
 ---
 
-## 📝 License
+## License
 
 MIT
 
