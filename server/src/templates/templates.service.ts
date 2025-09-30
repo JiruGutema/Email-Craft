@@ -175,5 +175,6 @@ export class TemplatesService {
       .map(fav => fav.template)
       .filter(template => !!template);
     return favoriteTemplates;
+
   }
 }

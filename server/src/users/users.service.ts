@@ -106,4 +106,20 @@ export class UsersService {
     });
     
   }
+  async logout(userId: string) {
+
+    if (!userId) {
+      return null;
+    }
+    await Prisma.users.update({
+      where: { id: userId },
+      data: {
+        googleAccessToken: null,
+        googleRefreshToken: null,
+      },
+    });
+    
+  }
+
+
 }

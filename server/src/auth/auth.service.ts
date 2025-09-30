@@ -58,4 +58,14 @@ export class AuthService {
     }
     return { message: 'User deleted successfully' };
   }
+
+
+  async logout(userId: string) {
+    const res = await this.usersService.logout(userId);
+
+    if (!res) {
+      throw new NotFoundException('User not found');
+    }
+    return { message: 'Logged out successfully' };
+  }
 }

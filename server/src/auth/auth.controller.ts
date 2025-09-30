@@ -30,6 +30,16 @@ export class AuthController {
   login(@Body() createAuthDto: CreateAuthDto) {
     return this.authService.login(createAuthDto);
   }
+
+  @UseGuards(AuthGuard)
+  @ApiOperation({ summary: 'Logout user' })
+  @Post('logout')
+  logout(@Req() req) {
+    const userId = req.user.userId
+    return this.authService.logout(userId);
+  }
+
+
   @ApiOperation({ summary: 'Signup user' })
   @Post('signup')
   signup(@Body() signupUserDto: SignupUserDto) {

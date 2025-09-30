@@ -4,4 +4,6 @@ export class CreateUserDto {
   email: string;
   password: string;
   picture: string;
+  googleAccessToken: string | null;
+  googleRefreshToken: string | null;
 }
