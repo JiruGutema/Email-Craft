@@ -1,11 +1,11 @@
 'use client'
-import { ComposerHeader } from "@/components/email/composer-header"
+import { ComposerHeader } from "@/components/header/composer-header"
 import { ProfileContent } from "@/components/profile/profile-content"
 import { AuthGuard } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Spinner from "@/components/spinner"
-import { ComposerSidebar } from "@/components/email/composer-sidebar"
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar"
 
 export default function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)

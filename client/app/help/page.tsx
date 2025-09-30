@@ -22,8 +22,8 @@ import {
   FileText,
   Palette,
 } from "lucide-react"
-import { ComposerSidebar } from "@/components/email/composer-sidebar"
-import { ComposerHeader } from "@/components/email/composer-header"
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar"
+import { ComposerHeader } from "@/components/header/composer-header"
 import { useRouter } from "next/navigation"
 import { AuthGuard } from "@/lib/utils"
 import Spinner from "@/components/spinner"

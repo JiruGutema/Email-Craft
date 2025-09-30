@@ -1,8 +1,8 @@
 'use client'
 import DraftsPage from "@/components/draft/drafts"
 import { ComposerForm } from "@/components/email/composer-form"
-import { ComposerHeader } from "@/components/email/composer-header"
-import { ComposerSidebar } from "@/components/email/composer-sidebar"
+import { ComposerHeader } from "@/components/header/composer-header"
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar"
 import FavoritesPage from "@/components/favorites/favorite-template"
 import Spinner from "@/components/spinner"
 import { AuthGuard } from "@/lib/utils"

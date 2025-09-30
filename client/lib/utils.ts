@@ -38,6 +38,11 @@ export function ApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL?.toString() || "";
 }
 
+export function getLocalUser(){
+  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
+  return  user
+}
+
 const isDevelopment = process.env.NEXT_PUBLIC_NODE_ENV === "development";
 
 export const Logger = {

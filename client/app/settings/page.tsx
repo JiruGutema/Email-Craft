@@ -1,6 +1,6 @@
 'use client'
-import { ComposerHeader } from "@/components/email/composer-header"
-import { ComposerSidebar } from "@/components/email/composer-sidebar"
+import { ComposerHeader } from "@/components/header/composer-header"
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar"
 import { AuthGuard } from "@/lib/utils"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"

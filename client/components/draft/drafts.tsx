@@ -97,6 +97,7 @@ if (drafts.length > 0) {
     if (draft.ok) {
       setDrafts(drafts.filter((draft) => draft.id !== draftId));
       toast({ description: "Draft deleted successfully" });
+      console.log('delete draft', draft)
     } else {
       Logger.error("Failed to delete draft");
       toast({ description: "Failed to delete draft", variant: "destructive" });

@@ -1,11 +1,25 @@
-import { useState } from "react"
-import { usePathname } from "next/navigation"
-import { HelpCircle, Home, Send, Menu, BookTemplate, PlusIcon, DeleteIcon, BookDashed, PaintRollerIcon, DivideIcon, ChartNoAxesColumnDecreasing } from "lucide-react"
-import { NavItem } from "@/components/nav-item"
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import {
+  HelpCircle,
+  Home,
+  Send,
+  Menu,
+  BookTemplate,
+  PlusIcon,
+  DeleteIcon,
+  BookDashed,
+  PaintRollerIcon,
+  DivideIcon,
+  ChartNoAxesColumnDecreasing,
+  PanelLeftIcon,
+} from "lucide-react";
+import { NavItem } from "@/components/nav-item";
+import { getLocalUser } from "@/lib/utils";
 
 export function AdminSidebar() {
-  const pathname = usePathname()
-  const [open, setOpen] = useState(false)
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   // Sidebar content as a component for reuse
   const SidebarContent = (
@@ -13,7 +27,6 @@ export function AdminSidebar() {
       <nav className="space-y-1 px-1 pt-4 flex-1">
         <NavItem
           href="/"
-          
           icon={<Home className="h-4 w-4" />}
           active={pathname === "/"}
         >
@@ -29,14 +42,24 @@ export function AdminSidebar() {
         <NavItem
           href="/drafts"
           icon={
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
               <path
                 d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <polyline points="22,6 12,13 2,6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <polyline
+                points="22,6 12,13 2,6"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           }
           active={pathname === "/drafts"}
@@ -50,16 +73,38 @@ export function AdminSidebar() {
         >
           Help
         </NavItem>
-        <NavItem href="/admin/templates" icon={<PaintRollerIcon className="h-4 w-4" />} active={pathname === "/templates"}>
+        <NavItem
+          href="/admin/templates"
+          icon={<PaintRollerIcon className="h-4 w-4" />}
+          active={pathname === "/templates"}
+        >
           Templates
         </NavItem>
-        <NavItem href="/admin/categories" icon={<ChartNoAxesColumnDecreasing className="h-4 w-4" />} active={pathname === "/categories"}>
+        <NavItem
+          href="/admin/categories"
+          icon={<ChartNoAxesColumnDecreasing className="h-4 w-4" />}
+          active={pathname === "/categories"}
+        >
           Categories
         </NavItem>
-       
+        {(() => {
+          const user = getLocalUser();
+          if (user.role === "admin") {
+            return (
+              <NavItem
+                href="/admin"
+                icon={<PanelLeftIcon className="h-4 w-4" />}
+                active={pathname === "/admin"}
+              >
+                Admin
+              </NavItem>
+            );
+          }
+          return null;
+        })()}
       </nav>
     </div>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -101,5 +146,5 @@ export function AdminSidebar() {
         )}
       </div>
     </div>
-  )
+  );
 }

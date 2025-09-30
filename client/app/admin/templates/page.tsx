@@ -18,7 +18,7 @@ import Prism from "prismjs";
 import "prismjs/components/prism-markup";
 import "prismjs/themes/prism.css";
 import Editor from "react-simple-code-editor";
-import { getToken, HandleLogout, Logger } from "@/lib/utils";
+import { getLocalUser, getToken, HandleLogout, Logger } from "@/lib/utils";
 import { AdminHeader } from "@/components/admin/admin-header";
 import Link from "next/link";
 import {
@@ -31,7 +31,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TemplateData } from "@/lib/types";
-import { ComposerSidebar } from "@/components/email/composer-sidebar";
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar";
 import { isAdmin } from "@/lib/auth";
 import Spinner from "@/components/spinner";
 
@@ -84,8 +84,9 @@ export default function TemplatesPage() {
 
   // Helper to fetch and set templates
   const fetchTemplatesAndSet = async () => {
+    
     try {
-      const res = await getTemplates();
+      const res = await getTemplates(getToken() || '');
       const templates: TemplateData[] = await res.json().catch(() => []);
       setEmailTemplates(templates);
     } catch (error) {

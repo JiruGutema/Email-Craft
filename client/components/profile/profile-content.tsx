@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Edit, LogOut, LogOutIcon, Trash2 } from "lucide-react"
-import Image from "next/image"
-import type { ProfileData } from "@/lib/types"
-import { useEffect } from "react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Edit, LogOut, LogOutIcon, Trash2 } from "lucide-react";
+import Image from "next/image";
+import type { ProfileData } from "@/lib/types";
+import { useEffect } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -17,165 +17,172 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from "@/components/ui/dialog"
-import {getToken, HandleLogout, Logger } from "@/lib/utils"
-import { deleteMe, getUserProfile } from "@/lib/user"
-import { set } from "react-hook-form"
-import { Description } from "@radix-ui/react-toast"
-import { getDrafts } from "@/lib/drafts"
-import { toast } from "@/hooks/use-toast"
+} from "@/components/ui/dialog";
+import { getToken, HandleLogout, Logger } from "@/lib/utils";
+import { deleteMe, getUserProfile } from "@/lib/user";
+import { set } from "react-hook-form";
+import { Description } from "@radix-ui/react-toast";
+import { getDrafts } from "@/lib/drafts";
+import { toast } from "@/hooks/use-toast";
+import Spinner from "../spinner";
 
 export function ProfileContent() {
-
-
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     email: "",
     username: "",
     profile: "",
-    id: ""
-  })
+    id: "",
+  });
   const [draftsCount, setDraftsCount] = useState(0);
   const [templatesCount, setTemplatesCount] = useState(0);
+  const [isFetching, setFetch] = useState(true);
 
-useEffect(() => {
-  const fetchUser = async () => {
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await getUserProfile(getToken() || "");
+
+        if (res.status === 401) {
+          localStorage.removeItem("user");
+          localStorage.removeItem("token");
+
+          toast({
+            description: "Session expired. Please log in again.",
+            variant: "destructive",
+          });
+
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+
+          return; // stop execution
+        }
+
+        if (!res.ok) {
+          Logger.error("Failed to fetch user:", res.status, res.statusText);
+          toast({
+            description: "Failed to fetch user data. Please try again later.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const user = await res.json();
+        setProfileData({
+          name: user?.name ?? user?.username ?? "",
+          email: user?.email || "",
+          username: user?.username || "",
+          profile: user?.picture || "",
+          id: user?.id || "",
+        });
+        setFetch(false)
+
+      } catch (error) {
+        Logger.error("Error fetching user:", error);
+        toast({
+          description: "Network error. Could not fetch user.",
+          variant: "destructive",
+        });
+        setFetch(false);
+      }
+    };
+
+    const fetchDraftsCount = async () => {
+      try {
+        const drafts = await getDrafts(getToken() || "");
+        if (!drafts.ok) {
+          Logger.error(
+            "Failed to fetch drafts:",
+            drafts.status,
+            drafts.statusText
+          );
+          return;
+        }
+        const draftsData = await drafts.json();
+        setDraftsCount(draftsData.length);
+      } catch (error) {
+        Logger.error("Error fetching drafts:", error);
+        toast({
+          description: "Network error. Could not fetch drafts.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchUser();
+    fetchDraftsCount();
+  }, []);
+
+  const handleSave = () => {
+    setIsEditing(false);
+    Logger.log("Profile saved:", profileData);
+  };
+
+  // Delete Account Dialog State
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+
     try {
-      const res = await getUserProfile(getToken() || "");
+      const res = await deleteMe(getToken() || "");
+      const data = await res.json().catch(() => null);
+      Logger.log(data);
 
-      if (res.status === 401) {
+      if (res.ok) {
+        // Success
         localStorage.removeItem("user");
         localStorage.removeItem("token");
+        toast({
+          description: "User account deleted successfully.",
+          variant: "default",
+        });
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 3000);
+        return; // stop here
+      }
 
+      if ([401, 403, 404].includes(res.status)) {
+        //Common expired-session handling
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
         toast({
           description: "Session expired. Please log in again.",
           variant: "destructive",
         });
-
         setTimeout(() => {
           window.location.href = "/login";
         }, 3000);
-
-        return; // stop execution
-      }
-
-      if (!res.ok) {
-        Logger.error("Failed to fetch user:", res.status, res.statusText);
-        toast({
-          description: "Failed to fetch user data. Please try again later.",
-          variant: "destructive",
-        });
         return;
       }
 
-      const user = await res.json();
-      setProfileData({
-        name: user?.name ?? user?.username ?? "",
-        email: user?.email || "",
-        username: user?.username || "",
-        profile: user?.picture || "",
-        id: user?.id || "",
+      // Other API errors
+      Logger.error("Failed to delete account:", res.status, res.statusText);
+      toast({
+        description: "Failed to delete account. Please try again.",
+        variant: "destructive",
       });
     } catch (error) {
-      Logger.error("Error fetching user:", error);
+      // Network or unexpected errors
+      Logger.error("Error deleting account:", error);
       toast({
-        description: "Network error. Could not fetch user.",
+        description: "An error occurred. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
     }
   };
-
-  const fetchDraftsCount = async () => {
-    try {
-      const drafts = await getDrafts(getToken() || "");
-      if (!drafts.ok) {
-        Logger.error("Failed to fetch drafts:", drafts.status, drafts.statusText);
-        return;
-      }
-      const draftsData = await drafts.json();
-      setDraftsCount(draftsData.length);
-    } catch (error) {
-      Logger.error("Error fetching drafts:", error);
-      toast({
-        description: "Network error. Could not fetch drafts.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  fetchUser();
-  fetchDraftsCount();
-}, []);
-
-  const handleSave = () => {
-    setIsEditing(false)
-    Logger.log("Profile saved:", profileData)
+  if (isFetching) {
+    return <Spinner />;
   }
-
-
-  // Delete Account Dialog State
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [isLoggingOut, setIsLoggingOut] = useState(false)
-
-const handleDeleteAccount = async () => {
-  setIsDeleting(true);
-
-  try {
-    const res = await deleteMe(getToken() || "");
-    const data = await res.json().catch(() => null);
-    Logger.log(data);
-
-    if (res.ok) {
-      // Success
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      toast({
-        description: "User account deleted successfully.",
-        variant: "default",
-      });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 3000);
-      return; // stop here
-    }
-
-    if ([401, 403, 404].includes(res.status)) {
-      //Common expired-session handling
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
-      toast({
-        description: "Session expired. Please log in again.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 3000);
-      return;
-    }
-
-    // Other API errors
-    Logger.error("Failed to delete account:", res.status, res.statusText);
-    toast({
-      description: "Failed to delete account. Please try again.",
-      variant: "destructive",
-    });
-
-  } catch (error) {
-    // Network or unexpected errors
-    Logger.error("Error deleting account:", error);
-    toast({
-      description: "An error occurred. Please try again.",
-      variant: "destructive",
-    });
-  } finally {
-    setIsDeleting(false);
-    setShowDeleteDialog(false);
-  }
-};
-
 
   return (
     <div className="p-6">
@@ -185,7 +192,7 @@ const handleDeleteAccount = async () => {
           <div className="flex items-center gap-4 mb-6">
             <div className="h-20 w-20 overflow-hidden rounded-full">
               <Image
-                src={profileData?.profile || '/default-profile.png'}
+                src={profileData?.profile || "/default-profile.png"}
                 alt={profileData.name[0]}
                 width={80}
                 height={80}
@@ -193,41 +200,62 @@ const handleDeleteAccount = async () => {
               />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-foreground-900">{profileData.name}</h3>
+              <h3 className="text-xl font-semibold text-foreground-900">
+                {profileData.name}
+              </h3>
               <p className="text-foreground-600">{profileData.email}</p>
-              <p className="text-sm text-foreground-500 mt-1">{profileData.username}</p>
+              <p className="text-sm text-foreground-500 mt-1">
+                {profileData.username}
+              </p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)} className="gap-2">
+        {/*     <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditing(!isEditing)}
+              className="gap-2"
+            >
               <Edit className="h-4 w-4" />
               {isEditing ? "Cancel" : "Edit"}
-            </Button>
+            </Button> */}
           </div>
 
           {isEditing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground-700 mb-2">Name</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">
+                  Name
+                </label>
                 <Input
                   value={profileData.name}
-                  onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, name: e.target.value })
+                  }
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground-700 mb-2">Email</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">
+                  Email
+                </label>
                 <Input
                   type="email"
                   value={profileData.email}
-                  onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, email: e.target.value })
+                  }
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground-700 mb-2">Company</label>
+                <label className="block text-sm font-medium text-foreground-700 mb-2">
+                  Company
+                </label>
                 <Input
                   value={profileData.username}
-                  onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, username: e.target.value })
+                  }
                 />
               </div>
-    
+
               <div className="flex gap-2">
                 <Button onClick={handleSave}>Save Changes</Button>
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -244,12 +272,20 @@ const handleDeleteAccount = async () => {
 
         {/* Stats Card */}
         <div className="bg-background border rounded-lg p-6 mb-6">
-          <h4 className="font-semibold text-foreground-900 mb-4">Email Statistics</h4>
+          <h4 className="font-semibold text-foreground-900 mb-4">
+            Email Statistics
+          </h4>
           <div className="grid grid-cols-2 gap-4">
-            <div onClick={()=>{window.location.href = "/drafts"}
-              } className="text-center">
-              <div className="text-2xl font-bold hover:cursor-pointer text-green-600">{draftsCount}</div>
-              <div  className="text-sm text-gray-600">Drafts</div>
+            <div
+              onClick={() => {
+                window.location.href = "/drafts";
+              }}
+              className="text-center"
+            >
+              <div className="text-2xl font-bold hover:cursor-pointer text-green-600">
+                {draftsCount}
+              </div>
+              <div className="text-sm text-gray-600">Drafts</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">15</div>
@@ -260,7 +296,9 @@ const handleDeleteAccount = async () => {
 
         {/* Actions Card */}
         <div className="bg-background border rounded-lg p-6">
-          <h4 className="font-semibold text-foreground-900 mb-4">Account Actions</h4>
+          <h4 className="font-semibold text-foreground-900 mb-4">
+            Account Actions
+          </h4>
           <div className="flex flex-row justify-between">
             <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
               <DialogTrigger asChild>
@@ -309,7 +347,8 @@ const handleDeleteAccount = async () => {
                 <DialogHeader>
                   <DialogTitle>Are you sure?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. This will permanently delete your account and all associated data.
+                    This action cannot be undone. This will permanently delete
+                    your account and all associated data.
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -332,5 +371,5 @@ const handleDeleteAccount = async () => {
         </div>
       </div>
     </div>
-  )
+  );
 }

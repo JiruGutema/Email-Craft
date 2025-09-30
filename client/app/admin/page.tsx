@@ -1,6 +1,6 @@
 "use client";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
-import { ComposerHeader } from "@/components/email/composer-header";
+import { ComposerHeader } from "@/components/header/composer-header";
 import Spinner from "@/components/spinner";
 import { toast } from "@/hooks/use-toast";
 import { isAdmin } from "@/lib/auth";

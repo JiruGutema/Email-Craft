@@ -68,7 +68,7 @@ export function ComposerHeader({
           <DialogTrigger asChild>
             <Button
               variant="outline"
-              className="w-30 justify-start mt-0 text-foreground hover:text-background border-red-500 hover:bg-foreground bg-transparent"
+              className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-foreground bg-transparent"
             >
               <LogOutIcon className="h-4 w-4" />
               Logout
