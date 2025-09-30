@@ -59,8 +59,9 @@ export default function FavoritesPage() {
   const [emailTemplates, setEmailTemplates] = useState<TemplateData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateData | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateData | null>(
+    null
+  );
   const [previewOpen, setPreviewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -94,7 +95,6 @@ export default function FavoritesPage() {
         if (!ignore) setEmailTemplates(templates);
         setLoading(false);
       } catch (err) {
-
         console.error("Network error fetching templates:", err);
         toast({
           description: "Network error. Please try again later.",
@@ -209,7 +209,9 @@ export default function FavoritesPage() {
                       <button
                         className={
                           "absolute top-4 right-4 p-2 bg-transparent transition " +
-                          (template.isFavorite ? "text-green-700 " : "text-green-700")
+                          (template.isFavorite
+                            ? "text-green-700 "
+                            : "text-green-700")
                         }
                         style={{ zIndex: 10 }}
                         onClick={async () => {
@@ -222,10 +224,14 @@ export default function FavoritesPage() {
                               return;
                             }
 
-                            const res = await addFavorite(template.id, getToken() || "");
+                            const res = await addFavorite(
+                              template.id,
+                              getToken() || ""
+                            );
                             if (res.status === 401) {
                               toast({
-                                description: "Session expired. Please log in again.",
+                                description:
+                                  "Session expired. Please log in again.",
                               });
                               setTimeout(() => {
                                 window.location.href = "/login";
@@ -246,7 +252,8 @@ export default function FavoritesPage() {
                             toast({
                               description: data.message,
                               variant:
-                                data.message === "Template unfavorited successfully"
+                                data.message ===
+                                "Template unfavorited successfully"
                                   ? "destructive"
                                   : "default",
                             });
@@ -256,7 +263,9 @@ export default function FavoritesPage() {
                                 t.id === template.id
                                   ? {
                                       ...t,
-                                      isFavorite: data.message !== "Template unfavorited successfully",
+                                      isFavorite:
+                                        data.message !==
+                                        "Template unfavorited successfully",
                                     }
                                   : t
                               )
@@ -270,10 +279,7 @@ export default function FavoritesPage() {
                           }
                         }}
                       >
-                        <Heart
-                          className="icon w-8 h-8"
-                          fill="#15803d" 
-                        />
+                        <Heart className="icon w-8 h-8" fill="#15803d" />
                       </button>
                       <DialogTrigger asChild>
                         <Button
@@ -294,7 +300,7 @@ export default function FavoritesPage() {
                         </DialogHeader>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
                           <div>
- <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-2">
                               <h3 className="font-medium mb-2">Preview</h3>
                               <button
                                 className={
@@ -348,7 +354,9 @@ export default function FavoritesPage() {
                                           : "default",
                                     });
                                     setEmailTemplates((prevTemplates) =>
-                                      prevTemplates.filter((t) => t.id !== template.id)
+                                      prevTemplates.filter(
+                                        (t) => t.id !== template.id
+                                      )
                                     );
                                   } catch (error) {
                                     console.error(
@@ -364,7 +372,7 @@ export default function FavoritesPage() {
                               >
                                 <Heart
                                   className="icon w-8 h-8"
-                                  fill= "#15803d"
+                                  fill="#15803d"
                                 />
                               </button>
                             </div>
