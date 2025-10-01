@@ -97,26 +97,26 @@ useEffect(() => {
         <div className="p-6">
 
           <h1 className="text-2xl font-bold mb-4">Admin Dashboard</h1>
-          <p>Welcome to the admin dashboard. Here you can manage the application.</p>
+          <p>Welcome to the Users management dashboard. Here you can manage user accounts and permissions.</p>
           <div className="flex flex-row gap-4 mt-6 ">
             <div>
               <button
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className="px-4 py-2 bg-foreground text-background rounded "
                 onClick={() => (window.location.href = "/admin/templates")}
               >
-                Manage Templates
+                Delete Users
               </button>
               <button
-                className="ml-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className="ml-4 px-4 py-2 bg-foreground text-background rounded "
                 onClick={() => (window.location.href = "/admin/categories")}
               >
-                Manage Categories
+                Edit Users
               </button>
               <button
-                className="ml-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-                onClick={() => (window.location.href = "/admin/users")}
+                className="ml-4 px-4 py-2 bg-foreground text-background rounded"
+                onClick={() => (window.location.href = "/admin/categories")}
               >
-                Manage Users
+                Add Admins
               </button>
 
             </div>

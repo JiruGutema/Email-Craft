@@ -23,7 +23,7 @@ export function ComposerSidebar() {
       <nav className="space-y-1 px-1 pt-4 flex-1">
         <NavItem
           href="/"
-          icon={<Home className="h-4 w-4" />}
+          icon={<Home className="h-4 w-4 text-background" />}
           active={pathname === "/"}
         >
           Home

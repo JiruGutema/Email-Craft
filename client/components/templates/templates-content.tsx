@@ -430,7 +430,7 @@ export default function TemplatesPage() {
                                   Use Template
                                 </Button>
                                 <Button
-                                  variant="outline"
+                                  variant="destructive"
                                   onClick={() => setPreviewOpen(false)}
                                 >
                                   Close
