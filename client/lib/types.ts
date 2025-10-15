@@ -7,7 +7,7 @@ export interface NavItemProps {
 }
 
 export interface EmailData {
-  to: string;
+  to: string[];
   subject: string;
   body: string;
 }
@@ -32,7 +32,7 @@ export interface ProfileData {
   id: string;
 }
 export interface DraftData {
-  to: string;
+  to: string[];
   subject: string;
   body: string;
 }
@@ -63,7 +63,7 @@ export interface CategoryData {
 export type ViewType = "login" | "signup" | "composer" | "profile";
 export interface Draft {
   id: string;
-  to: string;
+  to: string[];
   subject: string;
   body: string;
   createdAt: Date;

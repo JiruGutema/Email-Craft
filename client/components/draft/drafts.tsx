@@ -57,7 +57,7 @@ if (drafts.length > 0) {
   drafts.filter((draft) => {
       const matchesSearch =
         draft.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        draft.to.toLowerCase().includes(searchQuery.toLowerCase());
+        draft.to.join(", ").toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter = filterBy === "all";
       return matchesSearch && matchesFilter;
     })
@@ -66,13 +66,13 @@ if (drafts.length > 0) {
         case "subject":
           return a.subject.localeCompare(b.subject);
         case "recipient":
-          return a.to.localeCompare(b.to);
+          return a.to.join(", ").localeCompare(b.to.join(", "));
         default:
           return 0;
       }
     });
   }
-  const handleEdit = (to: string, subject: string, body: string) => {
+  const handleEdit = (to: string[], subject: string, body: string) => {
     const draft = {
       to,
       subject,
@@ -95,7 +95,7 @@ if (drafts.length > 0) {
     }
   };
 
-  const handleSend = (to: string, subject: string, body: string) => {
+  const handleSend = (to: string[], subject: string, body: string) => {
     toast({ description: "Please, Review it first" })
     setTimeout(() => {
       handleEdit(to, subject, body); 

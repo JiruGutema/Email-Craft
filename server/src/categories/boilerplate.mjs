@@ -13,5 +13,5 @@ async function seedTemplates() {
   };
 
 seedTemplates();
-// console.log(await prisma.templateCategories.findMany());
+console.log(await prisma.templateCategories.findMany());
 

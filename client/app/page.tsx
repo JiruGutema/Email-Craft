@@ -149,7 +149,7 @@ const handleSubscription = async (email: string) => {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline">
+              <Button size="lg" variant="outline" className="bg-blue-500 text-white hover:bg-blue-600" onClick={() => window.open("https://www.youtube.com/watch?v=Abs08REbc4o&t=4s", "_blank")}>
                 Watch Demo
               </Button>
             </div>

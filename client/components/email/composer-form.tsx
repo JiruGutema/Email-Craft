@@ -11,106 +11,130 @@ import Prism from "prismjs";
 import "prismjs/themes/prism.css";
 import "prismjs/components/prism-markup"; // For HTML highlighting
 import { sendEmail } from "@/lib/email";
-import {getToken, HandleLogout, Logger } from "@/lib/utils";
+import { getToken, HandleLogout, Logger } from "@/lib/utils";
 import { saveDraft } from "@/lib/drafts";
 import { toast } from "@/hooks/use-toast";
 
 export function ComposerForm() {
-  const defaultEmailData: EmailData = { to: "", subject: "", body: "" };
+  const defaultEmailData: EmailData = { to: [], subject: "", body: "" };
   const [emailData, setEmailData] = useState<EmailData>(defaultEmailData);
   const [activeTab, setActiveTab] = useState("compose");
   const [isSending, setIsSending] = useState(false);
 
-// Load cached form data on mount
-useEffect(() => {
-  const cached = localStorage.getItem("composerFormCache");
-  if (cached) {
-    try {
-      const parsed = JSON.parse(cached);
-      setEmailData({ ...defaultEmailData, ...parsed });
-    } catch {
-      setEmailData(defaultEmailData);
-    }
-  } else {
-    setEmailData(defaultEmailData);
-  }
-}, []);
-
-// Cache form data on change, but only if not empty
-useEffect(() => {
-  if (emailData.to || emailData.subject || emailData.body) {
-    localStorage.setItem("composerFormCache", JSON.stringify(emailData));
-  }
-}, [emailData]);
-
-const handleSessionExpired = () => {
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  toast({
-    description: "Session expired. Please log in again.",
-    variant: "destructive",
+  const [composeData, setComposeData] = useState<EmailData>(() => {
+    const cached = localStorage.getItem("composerFormCache");
+    return cached ? JSON.parse(cached) : { to: "", subject: "", body: "" };
   });
-  setTimeout(() => {
-    window.location.href = "/login";
-  }, 3000);
-};
 
-const handleSendEmail = async () => {
-  setIsSending(true);
-  try {
-    const response = await sendEmail(emailData, getToken() || "");
-    const resData = await response.json().catch(() => null);
+  useEffect(() => {
+    localStorage.setItem("composerFormCache", JSON.stringify(composeData));
+  }, [composeData]);
 
-    if (response.status === 401) {
-      handleSessionExpired();
-      return;
-    }
-
-    if (response.ok) {
-      toast({ description: "Email sent successfully" });
+  // Load cached form data on mount
+  useEffect(() => {
+    const cached = localStorage.getItem("composerFormCache");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setEmailData({ ...defaultEmailData, ...parsed });
+        console.log("retrieved data", parsed);
+      } catch {
+        setEmailData(defaultEmailData);
+      }
+    } else {
       setEmailData(defaultEmailData);
-      localStorage.removeItem("composerFormCache");
-    } else {
-      Logger.error("Failed to send email:", response.status, response.statusText);
-      toast({ description: "Failed to send email", variant: "destructive" });
     }
+  }, []);
 
-    Logger.log(resData);
-  } catch (error) {
-    Logger.error("Error sending email:", error);
-    toast({ description: "An error occurred. Please try again.", variant: "destructive" });
-  } finally {
-    setIsSending(false);
-  }
-};
+  // Cache form data on change, but only if not empty
+  useEffect(() => {
+    if (emailData.to || emailData.subject || emailData.body) {
+      localStorage.setItem("composerFormCache", JSON.stringify(emailData));
+    }
+  }, [emailData]);
 
-const handleSaveDraft = async () => {
-  if (!emailData.to && !emailData.subject && !emailData.body) {
-    toast({ description: "No changes to save" });
-    return;
-  }
+  const handleSessionExpired = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    toast({
+      description: "Session expired. Please log in again.",
+      variant: "destructive",
+    });
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 3000);
+  };
 
-  try {
-    const response = await saveDraft(emailData, getToken() || "");
-    const resData = await response.json().catch(() => null);
+  const handleSendEmail = async () => {
+    setIsSending(true);
+    try {
+      const response = await sendEmail(emailData, getToken() || "");
+      const resData = await response.json().catch(() => null);
 
-    if (response.status === 401) {
-      handleSessionExpired();
+      if (response.status === 401) {
+        handleSessionExpired();
+        return;
+      }
+
+      if (response.ok) {
+        toast({ description: "Email sent successfully" });
+        setEmailData(defaultEmailData);
+        localStorage.removeItem("composerFormCache");
+      } else {
+        Logger.error(
+          "Failed to send email:",
+          response.status,
+          response.statusText
+        );
+        toast({ description: "Failed to send email", variant: "destructive" });
+      }
+
+      Logger.log(resData);
+    } catch (error) {
+      Logger.error("Error sending email:", error);
+      toast({
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    if (!emailData.to && !emailData.subject && !emailData.body) {
+      toast({ description: "No changes to save" });
       return;
     }
 
-    if (response.ok) {
-      Logger.log(resData);
-      toast({ description: "Draft saved successfully" });
-    } else {
-      Logger.error("Failed to save draft:", response.status, response.statusText);
-      toast({ description: "Failed to save draft", variant: "destructive" });
+    try {
+      const response = await saveDraft(emailData, getToken() || "");
+      const resData = await response.json().catch(() => null);
+
+      if (response.status === 401) {
+        handleSessionExpired();
+        return;
+      }
+
+      if (response.ok) {
+        Logger.log(resData);
+        toast({ description: "Draft saved successfully" });
+      } else {
+        Logger.error(
+          "Failed to save draft:",
+          response.status,
+          response.statusText
+        );
+        toast({ description: "Failed to save draft", variant: "destructive" });
+      }
+    } catch (error) {
+      Logger.error("Error saving draft:", error);
+      toast({
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
     }
-  } catch (error) {
-    Logger.error("Error saving draft:", error);
-    toast({ description: "An error occurred. Please try again.", variant: "destructive" });
-  }
-};
+  };
 
   return (
     <div className="max-w-4xl mx-auto bg-background text-foreground">
@@ -124,17 +148,54 @@ const handleSaveDraft = async () => {
             >
               To
             </label>
-            <Input
-              id="to"
-              type="email"
-              placeholder="recipient@example.com"
-              value={emailData.to}
-              onChange={(e) =>
-                setEmailData((prev) => ({ ...prev, to: e.target.value }))
-              }
-              className="w-1/2 text-black"
-            />
+            <div
+              className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md w-1/2 min-h-[2.5rem]"
+              onClick={(e) => e.currentTarget.querySelector("input")?.focus()}
+            >
+              {emailData.to.map((email, i) => (
+                <span
+                  key={i}
+                  className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-sm flex items-center gap-1"
+                >
+                  {email}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setEmailData((prev) => ({
+                        ...prev,
+                        to: prev.to.filter((_, idx) => idx !== i),
+                      }))
+                    }
+                    className="text-blue-600 hover:text-red-600"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                id="to"
+                type="email"
+                placeholder="Enter recipient and press Enter"
+                className="flex-grow outline-none bg-transparent p-1 rounded-sm text-black"
+                onKeyDown={(e) => {
+                  const value = e.currentTarget.value.trim();
+                  if (
+                    (e.key === "Enter" || e.key === ",") &&
+                    value &&
+                    /\S+@\S+\.\S+/.test(value)
+                  ) {
+                    e.preventDefault();
+                    setEmailData((prev) => ({
+                      ...prev,
+                      to: [...prev.to, value],
+                    }));
+                    e.currentTarget.value = "";
+                  }
+                }}
+              />
+            </div>
           </div>
+
           <div>
             <label
               htmlFor="subject"
@@ -184,7 +245,10 @@ const handleSaveDraft = async () => {
             >
               <p>Paste</p>
             </Button>
-            <TabsContent value="compose" style={{ height: "500px", overflow: "auto" }} >
+            <TabsContent
+              value="compose"
+              style={{ height: "500px", overflow: "auto" }}
+            >
               <Editor
                 value={emailData.body}
                 onValueChange={(code) =>
@@ -201,7 +265,6 @@ const handleSaveDraft = async () => {
                   borderRadius: 0,
                   border: "1px solid #e5e7eb",
                   color: "#333",
-    
                 }}
                 textareaId="html-editor"
                 textareaClassName="font-mono"

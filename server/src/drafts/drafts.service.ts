@@ -22,7 +22,11 @@ export class DraftsService {
     }
 
     const existingDraft = await prisma.drafts.findFirst({
-      where: { subject, to, userId },
+      where: {
+        subject,
+        to: { equals: to }, 
+        userId,
+      },
     });
     if (existingDraft) {
       throw new ForbiddenException(

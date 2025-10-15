@@ -71,8 +71,12 @@ export default function HelpPage() {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <ComposerSidebar />
-
       <div className="flex-1 overflow-scroll">
+      <ComposerHeader
+        onProfileClick={() => {
+          window.location.href = "/profile";
+        }}
+      />
         <div className="min-h-screen bg-background">
           <div className="container mx-auto px-4 py-8">
             <div className="max-w-6xl mx-auto">

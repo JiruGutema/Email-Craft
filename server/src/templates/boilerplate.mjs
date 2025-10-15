@@ -418,7 +418,7 @@ const welcomeTemplates = [
 ];
 
 
-const id = '745a4495-78b3-4db5-9bbe-3b622e00fe30'
+const id = '15827a3d-a9ee-445d-ac4d-a868ed9af4bf'
 
 function seedWelcomeTemplates() {
   welcomeTemplates.forEach(async (template) => {
@@ -441,5 +441,5 @@ function seedTemplates() {
 
 
 seedWelcomeTemplates();
-seedTemplates();
+// seedTemplates();
 
