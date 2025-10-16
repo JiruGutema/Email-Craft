@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Download, ArrowLeft, Heart } from "lucide-react";
+import { Search, Eye, Download, ArrowLeft, Heart, ThumbsUp, BookmarkCheckIcon } from "lucide-react";
 import Link from "next/link";
 import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
@@ -273,9 +273,9 @@ export default function TemplatesPage() {
                           }
                         }}
                       >
-                        <Heart
-                          className="icon w-8 h-8"
-                          fill={template.isFavorite ? "#15803d" : "white"}
+                        <BookmarkCheckIcon
+                          className="icon w-8 h-8 border-none text-transparent"
+                          fill={template.isFavorite ? "foreground" : "background"}
                         />
                       </button>
                       <DialogTrigger asChild>

@@ -23,14 +23,14 @@ export function ComposerSidebar() {
       <nav className="space-y-1 px-1 pt-4 flex-1">
         <NavItem
           href="/"
-          icon={<Home className="h-4 w-4 text-background" />}
+          icon={<Home className="h-4 w-4 rounded-sm" />}
           active={pathname === "/"}
         >
           Home
         </NavItem>
         <NavItem
           href="/composer"
-          icon={<Send className="h-4 w-4" />}
+          icon={<Send className="h-4 w-4 rounded-sm" />}
           active={pathname === "/composer"}
         >
           Compose

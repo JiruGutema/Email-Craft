@@ -1,65 +1,93 @@
-'use client'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { toast } from "@/hooks/use-toast"
-import { subscribe } from "@/lib/subscribe"
-import { AuthGuard, Logger } from "@/lib/utils"
-import { Edit3, User, Shield, Star, ArrowRight, MoonStar } from "lucide-react"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-
+"use client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/hooks/use-toast";
+import { subscribe } from "@/lib/subscribe";
+import { AuthGuard, HandleLogout, Logger } from "@/lib/utils";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogOverlay,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@radix-ui/react-dialog";
+import {
+  Edit3,
+  User,
+  Shield,
+  Star,
+  ArrowRight,
+  MoonStar,
+  LogOutIcon,
+} from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [email, setEmail] = useState("");
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
-
     const checkAuth = async () => {
       const isAuth = AuthGuard();
       setIsAuthenticated(isAuth);
     };
-    const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
+    const user =
+      typeof window !== "undefined"
+        ? JSON.parse(localStorage.getItem("user") || "null")
+        : null;
     setUser(user);
     checkAuth();
   }, []);
 
-const handleSubscription = async (email: string) => {
-  // Validate email format
-  if (!/\S+@\S+\.\S+/.test(email)) {
-    toast({
-      description: "Please enter a valid email address.",
-      variant: "destructive",
-    });
-    return;
-  }
-
-  try {
-    const res = await subscribe(email);
-    const data = await res.json().catch(() => null); // safe fallback if response is empty
-
-    if (res.ok) {
+  const handleSubscription = async (email: string) => {
+    // Validate email format
+    if (!/\S+@\S+\.\S+/.test(email)) {
       toast({
-        description: data?.message || "Subscribed successfully!",
-        variant: "default",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
       });
-    } else {
-      Logger.error("Subscription failed:", res.status, res.statusText, data);
+      return;
+    }
+
+    try {
+      const res = await subscribe(email);
+      const data = await res.json().catch(() => null); // safe fallback if response is empty
+
+      if (res.ok) {
+        toast({
+          description: data?.message || "Subscribed successfully!",
+          variant: "default",
+        });
+      } else {
+        Logger.error("Subscription failed:", res.status, res.statusText, data);
+        toast({
+          description:
+            data?.message || "Something went wrong. Please try again later.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      Logger.error("Network error during subscription:", error);
       toast({
-        description: data?.message || "Something went wrong. Please try again later.",
+        description: "Network error. Please try again later.",
         variant: "destructive",
       });
     }
-  } catch (error) {
-    Logger.error("Network error during subscription:", error);
-    toast({
-      description: "Network error. Please try again later.",
-      variant: "destructive",
-    });
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,64 +96,129 @@ const handleSubscription = async (email: string) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
-              
-              <span className="text-xl font-semibold text-foreground">Email Craft</span>
+              <img
+                src="./images/logo.png"
+                alt="Logo"
+                className="h-8 w-8 text-accent"
+              />
+
+              <span className="text-xl font-semibold text-foreground">
+                Email Craft
+              </span>
             </div>
             <nav className="hidden md:flex items-center gap-8">
-              <Link href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="#features"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Features
               </Link>
-              <Link href="#testimonials" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="#testimonials"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Testimonials
               </Link>
-              <Link href="#support" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link
+                href="#support"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
                 Support
               </Link>
-              <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
-              Terms and Privacy
+              <Link
+                href="/terms"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Terms and Privacy
               </Link>
             </nav>
 
             <div className="flex items-center gap-4">
-   <Button
-          variant="outline"
-          size="sm"
-          className="ml-2"
-          onClick={() => {
-            if (typeof window !== "undefined") {
-              document.documentElement.classList.toggle("dark");
-            }
-          }}
-        >
-          <MoonStar className="h-4 w-4" />
-        </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    document.documentElement.classList.toggle("dark");
+                  }
+                }}
+              >
+                <MoonStar className="h-4 w-4" />
+              </Button>
               {isAuthenticated ? (
-              <Link href="/profile">
-               {user?.picture ? (
-                 <img
-                   src={`${user?.picture || "/default-profile.png"}`}
-                   alt=""
-                   className="h-10 w-10 rounded-full border border-border"
-                 />
-               ) : (
-                 <User className="h-6 w-6 text-muted-foreground" />
-               )}
-                
-              
-              </Link>
-              ) : (
-              <>
-                <Link href="/login">
-                <Button variant="ghost" className=" bg-accent hover:bg-accent/70 text-accent-foreground">
-                  Login
+                <>
+                <Link href="/profile">
+                  {user?.picture ? (
+                    <img
+                      src={`${user?.picture || "/default-profile.png"}`}
+                      alt=""
+                      className="h-10 w-10 rounded-full border border-border"
+                    />
+                  ) : (
+                    <User className="h-6 w-6 text-muted-foreground" />
+                  )}
+                </Link>
+       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-foreground bg-transparent"
+                >
+                  <LogOutIcon className="h-4 w-4" />
+                  Logout
                 </Button>
-                </Link>
-                <Link href="/login">
-                <Button className="bg-accent hover:bg-accent/70 text-accent-foreground">Sign Up</Button>
-                </Link>
-              </>
+              </DialogTrigger>
+
+              <DialogOverlay className="fixed z-20 inset-0 bg-black/50" />
+
+              <DialogContent className="fixed top-1/2 left-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-foreground p-6 shadow-lg text-background">
+                <DialogHeader>
+                  <DialogTitle>Are you sure?</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to log out?
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button
+                      variant="outline"
+                      className="text-foreground"
+                      disabled={isLoggingOut}
+                    >
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    variant="destructive"
+                    onClick={HandleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? "Logging out..." : "Yes, log me out"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button
+                      variant="ghost"
+                      className=" bg-accent hover:bg-accent/70 text-accent-foreground"
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/login">
+                    <Button className="bg-accent hover:bg-accent/70 text-accent-foreground">
+                      Sign Up
+                    </Button>
+                  </Link>
+
+                </>
               )}
+     
             </div>
           </div>
         </div>
@@ -136,20 +229,35 @@ const handleSubscription = async (email: string) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-balance mb-6">
-              Compose Stunning Emails <span className="text-accent">Effortlessly</span>
+              Compose Stunning Emails{" "}
+              <span className="text-accent">Effortlessly</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8 text-balance max-w-2xl mx-auto">
-              Professional HTML email editing with user profiles and seamless authentication. Create beautiful,
-              responsive emails that engage your audience.
+              Professional HTML email editing with user profiles and seamless
+              authentication. Create beautiful, responsive emails that engage
+              your audience.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/composer">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button
+                  size="lg"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
                   Start Composing
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline" className="bg-blue-500 text-white hover:bg-blue-600" onClick={() => window.open("https://www.youtube.com/watch?v=Abs08REbc4o&t=4s", "_blank")}>
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-blue-500 text-white hover:bg-blue-600"
+                onClick={() =>
+                  window.open(
+                    "https://www.youtube.com/watch?v=Abs08REbc4o&t=4s",
+                    "_blank"
+                  )
+                }
+              >
                 Watch Demo
               </Button>
             </div>
@@ -165,7 +273,8 @@ const handleSubscription = async (email: string) => {
               Everything you need to create amazing emails
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-              Powerful features designed for modern email composition and management
+              Powerful features designed for modern email composition and
+              management
             </p>
           </div>
 
@@ -179,11 +288,12 @@ const handleSubscription = async (email: string) => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Create beautiful, responsive HTML emails with our intuitive editor. Real-time preview and professional
-                  templates included.
+                  Create beautiful, responsive HTML emails with our intuitive
+                  editor. Real-time preview and professional templates included.
                   <p className="mt-2 text-red-500">
-                    All HTML rendering is done on the client side for maximum privacy and security. which means your HTML
-                    is never exposed to the server and is only processed in the user's browser.
+                    All HTML rendering is done on the client side for maximum
+                    privacy and security. which means your HTML is never exposed
+                    to the server and is only processed in the user's browser.
                   </p>
                 </CardDescription>
               </CardContent>
@@ -198,14 +308,17 @@ const handleSubscription = async (email: string) => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Manage your account, track email statistics, and customize your workspace with comprehensive user
-                  profile management.
+                  Manage your account, track email statistics, and customize
+                  your workspace with comprehensive user profile management.
                   <p className="mt-2">
-                    Your profile data is securely stored and managed, your active sessions are monitored, and you have full control
+                    Your profile data is securely stored and managed, your
+                    active sessions are monitored, and you have full control
                     over your account settings.
-                  </p> <p className="m-2 text-red-500 font-bold">your active session lasts for maximum 60 minutes of inactivity. </p>
-                  
-
+                  </p>{" "}
+                  <p className="m-2 text-red-500 font-bold">
+                    your active session lasts for maximum 60 minutes of
+                    inactivity.{" "}
+                  </p>
                 </CardDescription>
               </CardContent>
             </Card>
@@ -219,11 +332,10 @@ const handleSubscription = async (email: string) => {
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
-                  Enterprise-grade security with Google OAuth integration. Your data is protected with industry-standard
-                  encryption.
-               
-                   Ensuring a secure and seamless login experience without handling passwords directly.
-              
+                  Enterprise-grade security with Google OAuth integration. Your
+                  data is protected with industry-standard encryption. Ensuring
+                  a secure and seamless login experience without handling
+                  passwords directly.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -235,7 +347,9 @@ const handleSubscription = async (email: string) => {
       <section className="py-20" id="testimonials">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-balance">Trusted by professionals worldwide</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-balance">
+              Trusted by professionals worldwide
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -250,7 +364,8 @@ const handleSubscription = async (email: string) => {
               {
                 name: "Ashenafi Godana",
                 role: "Cloud Architect",
-                content: "The user profile management and authentication system saved us weeks of development time.",
+                content:
+                  "The user profile management and authentication system saved us weeks of development time.",
                 rating: 5,
               },
               {
@@ -265,13 +380,20 @@ const handleSubscription = async (email: string) => {
                 <CardContent className="pt-6">
                   <div className="flex mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 fill-accent text-accent" />
+                      <Star
+                        key={i}
+                        className="h-5 w-5 fill-accent text-accent"
+                      />
                     ))}
                   </div>
-                  <p className="text-muted-foreground mb-4">"{testimonial.content}"</p>
+                  <p className="text-muted-foreground mb-4">
+                    "{testimonial.content}"
+                  </p>
                   <div>
                     <p className="font-semibold">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {testimonial.role}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -280,18 +402,23 @@ const handleSubscription = async (email: string) => {
         </div>
       </section>
 
-
       {/* CTA Section */}
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-balance">Ready to transform your email game?</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-balance">
+              Ready to transform your email game?
+            </h2>
             <p className="text-xl text-muted-foreground mb-8 text-balance">
-              Join thousands of professionals who trust EmailCraft for their email composition needs.
+              Join thousands of professionals who trust EmailCraft for their
+              email composition needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link href="/signup">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Button
+                  size="lg"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
                   Get Started
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -300,7 +427,6 @@ const handleSubscription = async (email: string) => {
                 Demo
               </Button>
             </div>
-            
           </div>
         </div>
       </section>
@@ -311,17 +437,23 @@ const handleSubscription = async (email: string) => {
           <div className="text-center max-w-2xl mx-auto">
             <h3 className="text-2xl font-bold mb-4">Stay updated</h3>
             <p className="text-muted-foreground mb-6">
-              Get the latest updates, tips, and best practices delivered to your inbox.
+              Get the latest updates, tips, and best practices delivered to your
+              inbox.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <Input
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Enter your email"
                 className="flex-1"
                 value={email}
               />
-              <Button onClick={() => handleSubscription(email)} className="bg-accent hover:bg-accent/90 text-accent-foreground">Subscribe</Button>
+              <Button
+                onClick={() => handleSubscription(email)}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
+                Subscribe
+              </Button>
             </div>
           </div>
         </div>
@@ -333,27 +465,45 @@ const handleSubscription = async (email: string) => {
           <div className="grid md:grid-cols-4 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                 <img src="./images/logo.png" alt="Logo" className="h-8 w-8 text-accent" />
-                <Link href={""} onClick={()=>{window.location.href="/"}}><span className="text-lg font-semibold">Email Craft</span></Link>
+                <img
+                  src="./images/logo.png"
+                  alt="Logo"
+                  className="h-8 w-8 text-accent"
+                />
+                <Link
+                  href={""}
+                  onClick={() => {
+                    window.location.href = "/";
+                  }}
+                >
+                  <span className="text-lg font-semibold">Email Craft</span>
+                </Link>
               </div>
-              <p className="text-muted-foreground text-sm">Professional email composition made simple and beautiful.</p>
+              <p className="text-muted-foreground text-sm">
+                Professional email composition made simple and beautiful.
+              </p>
             </div>
 
             <div>
               <h4 className="font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="#features" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="#features"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Features
                   </Link>
                 </li>
-             
+
                 <li>
-                  <Link href="/templates" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/templates"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Templates
                   </Link>
                 </li>
-             
               </ul>
             </div>
 
@@ -361,17 +511,21 @@ const handleSubscription = async (email: string) => {
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/help" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/help"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link href="/#contact" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/#contact"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Contact Us
                   </Link>
                 </li>
-              
-             
               </ul>
             </div>
 
@@ -379,25 +533,33 @@ const handleSubscription = async (email: string) => {
               <h4 className="font-semibold mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>
-                  <Link href="/terms" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/terms"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/terms"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Terms of Service
                   </Link>
                 </li>
-                
               </ul>
             </div>
           </div>
 
           <div className="border-t border-border mt-8 pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; {new Date().getFullYear()} Email Craft. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()} Email Craft. All rights
+              reserved.
+            </p>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

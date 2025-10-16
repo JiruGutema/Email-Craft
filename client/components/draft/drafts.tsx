@@ -4,14 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-  Edit3,
-  Trash2,
-  Send,
-  Mail,
-  MoreVertical,
-} from "lucide-react";
+import { Search, Edit3, Trash2, Send, Mail, MoreVertical } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +16,7 @@ import { getToken, Logger } from "@/lib/utils";
 import { set } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Draft } from "@/lib/types";
+import Spinner from "../spinner";
 
 export default function DraftsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,44 +27,54 @@ export default function DraftsPage() {
     "all"
   );
 
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
   // Mock draft data
   const [drafts, setDrafts] = useState<Draft[]>([]);
 
   useEffect(() => {
-    const fetchDrafts = async () => {
-      const drafts = await getDrafts(getToken() || "");
-      if( drafts.status === 401) {
-        toast({
-          description: "Session expired. Please logout and then login.",
-        });
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 3000);
-      }
-      setDrafts(await drafts.json());
-    };
-    fetchDrafts();
+    try {
+      const fetchDrafts = async () => {
+        const drafts = await getDrafts(getToken() || "");
+        if (drafts.status === 401) {
+          toast({
+            description: "Session expired. Please logout and then login.",
+          });
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 3000);
+        }
+        setDrafts(await drafts.json());
+        setIsDataLoaded(true);
+      };
+      fetchDrafts();
+    } catch (error) {
+      console.log("Error in fetching drafts");
+      setIsDataLoaded(true);
+      setDrafts([]);
+    }
   }, []);
-let filteredDrafts: Draft[] = [];
-if (drafts.length > 0) {
-   filteredDrafts = 
-  drafts.filter((draft) => {
-      const matchesSearch =
-        draft.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        draft.to.join(", ").toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesFilter = filterBy === "all";
-      return matchesSearch && matchesFilter;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case "subject":
-          return a.subject.localeCompare(b.subject);
-        case "recipient":
-          return a.to.join(", ").localeCompare(b.to.join(", "));
-        default:
-          return 0;
-      }
-    });
+
+  let filteredDrafts: Draft[] = [];
+  if (drafts.length > 0) {
+    filteredDrafts = drafts
+      .filter((draft) => {
+        const matchesSearch =
+          draft.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          draft.to.join(", ").toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = filterBy === "all";
+        return matchesSearch && matchesFilter;
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case "subject":
+            return a.subject.localeCompare(b.subject);
+          case "recipient":
+            return a.to.join(", ").localeCompare(b.to.join(", "));
+          default:
+            return 0;
+        }
+      });
   }
   const handleEdit = (to: string[], subject: string, body: string) => {
     const draft = {
@@ -96,9 +100,9 @@ if (drafts.length > 0) {
   };
 
   const handleSend = (to: string[], subject: string, body: string) => {
-    toast({ description: "Please, Review it first" })
+    toast({ description: "Please, Review it first" });
     setTimeout(() => {
-      handleEdit(to, subject, body); 
+      handleEdit(to, subject, body);
     }, 3000);
   };
 
@@ -106,6 +110,9 @@ if (drafts.length > 0) {
     return html.replace(/<[^>]*>/g, "").substring(0, 120) + "...";
   };
 
+  if (!isDataLoaded) {
+    return <Spinner />;
+  }
   return (
     <div className=" bg-background flex flex-col">
       {/* Filters and Search */}
@@ -140,10 +147,11 @@ if (drafts.length > 0) {
             ) : (
               <div className="flex flex-col gap-2">
                 {filteredDrafts.map((draft) => (
-                  
                   <div
                     key={draft.id}
-                    onClick={() => handleEdit(draft.to, draft.subject, draft.body)}
+                    onClick={() =>
+                      handleEdit(draft.to, draft.subject, draft.body)
+                    }
                     role="button"
                     tabIndex={0}
                     className="flex flex-col sm:flex-row items-start sm:items-center rounded-md border border-border bg-card px-4 py-2 hover:bg-muted transition-colors group"
@@ -190,7 +198,9 @@ if (drafts.length > 0) {
                             Edit
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => handleSend(draft.to, draft.subject, draft.body)}
+                            onClick={() =>
+                              handleSend(draft.to, draft.subject, draft.body)
+                            }
                           >
                             <Send className="h-4 w-4 mr-2" />
                             Send Now

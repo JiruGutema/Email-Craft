@@ -10,6 +10,7 @@ import { useState, useEffect } from "react"
 
 export default function Draft() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isDataLoaded, setIsDataLoaded] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
