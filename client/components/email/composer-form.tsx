@@ -37,7 +37,6 @@ export function ComposerForm() {
       try {
         const parsed = JSON.parse(cached);
         setEmailData({ ...defaultEmailData, ...parsed });
-        console.log("retrieved data", parsed);
       } catch {
         setEmailData(defaultEmailData);
       }
@@ -152,7 +151,7 @@ export function ComposerForm() {
               className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-md w-1/2 min-h-[2.5rem]"
               onClick={(e) => e.currentTarget.querySelector("input")?.focus()}
             >
-              {emailData.to.map((email, i) => (
+              {(emailData.to).map((email, i) => (
                 <span
                   key={i}
                   className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded-sm flex items-center gap-1"

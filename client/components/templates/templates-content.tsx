@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Download, ArrowLeft, Heart, ThumbsUp, BookmarkCheckIcon } from "lucide-react";
+import { Search, Eye, Download, ArrowLeft, Heart, ThumbsUp, BookmarkCheckIcon, BookmarkIcon } from "lucide-react";
 import Link from "next/link";
 import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
@@ -126,8 +126,8 @@ export default function TemplatesPage() {
 
   const handleUseTemplate = (body: string) => {
     const draft = {
-      to: "",
-      subject: "Please customize subject",
+      to: [""],
+      subject: "",
       body: body,
     };
     localStorage.setItem("composerFormCache", JSON.stringify(draft));
@@ -376,7 +376,7 @@ export default function TemplatesPage() {
                                   }
                                 }}
                               >
-                                <Heart
+                                <BookmarkIcon
                                   className="icon w-8 h-8"
                                   fill={
                                     template.isFavorite ? "#15803d" : "white"

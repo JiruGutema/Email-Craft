@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Eye, Download, ArrowLeft, Heart } from "lucide-react";
+import { Search, Eye, Download, ArrowLeft, Heart, BookmarkIcon } from "lucide-react";
 import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
 import { toast } from "@/hooks/use-toast";
@@ -125,8 +125,8 @@ export default function FavoritesPage() {
 
   const handleUseTemplate = (body: string) => {
     const draft = {
-      to: "",
-      subject: "Please customize subject",
+      to: [""],
+      subject: "",
       body: body,
     };
     localStorage.setItem("composerFormCache", JSON.stringify(draft));
@@ -279,7 +279,7 @@ export default function FavoritesPage() {
                           }
                         }}
                       >
-                        <Heart className="icon w-8 h-8" fill="#15803d" />
+                        <BookmarkIcon className="icon w-8 h-8" fill="#15803d" />
                       </button>
                       <DialogTrigger asChild>
                         <Button
@@ -370,7 +370,7 @@ export default function FavoritesPage() {
                                   }
                                 }}
                               >
-                                <Heart
+                                <BookmarkIcon 
                                   className="icon w-8 h-8"
                                   fill="#15803d"
                                 />
