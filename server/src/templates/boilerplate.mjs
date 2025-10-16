@@ -8,7 +8,7 @@ const emailTemplates = [
     categoryId: "Newsletter",
     htmlContent: `
       <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-        <header style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); padding: 40px 20px; text-align: center;">
+        <header style="background: #1f2937; padding: 40px 20px; text-align: center;">
           <h1 style="color: white; margin: 0; font-size: 28px;">Welcome to Our Community!</h1>
         </header>
         <div style="padding: 40px 20px; background: white;">
@@ -17,7 +17,7 @@ const emailTemplates = [
             We're thrilled to have you join our community. Get ready for exclusive content, updates, and special offers.
           </p>
           <div style="text-align: center; margin: 30px 0;">
-            <a href="#" style="background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            <a href="#" style="background: #1f2937; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               Get Started
             </a>
           </div>
@@ -42,7 +42,7 @@ const emailTemplates = [
             After months of development, we're excited to share our newest product with you. Experience the future today.
           </p>
           <div style="text-align: center;">
-            <a href="#" style="background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="#" style="background: #1f2937; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Shop Now
             </a>
           </div>
@@ -61,7 +61,7 @@ const emailTemplates = [
           <div style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
             <h1 style="color: #1f2937; text-align: center; margin-bottom: 20px;">You're Invited!</h1>
             <div style="text-align: center; margin-bottom: 30px;">
-              <div style="background: #8b5cf6; color: white; padding: 20px; border-radius: 8px; display: inline-block;">
+              <div style="background: #1f2937; color: white; padding: 20px; border-radius: 8px; display: inline-block;">
                 <h2 style="margin: 0; font-size: 24px;">Annual Conference 2024</h2>
                 <p style="margin: 10px 0 0 0;">March 15, 2024 • 9:00 AM</p>
               </div>
@@ -93,11 +93,11 @@ const emailTemplates = [
         <div style="padding: 40px 20px; background: white;">
           <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
             <div style="text-align: center; padding: 20px; background: #f1f5f9; border-radius: 8px;">
-              <h3 style="color: #8b5cf6; margin: 0; font-size: 32px;">$125K</h3>
+              <h3 style="color: #1f2937; margin: 0; font-size: 32px;">$125K</h3>
               <p style="color: #6b7280; margin: 5px 0 0 0;">Revenue</p>
             </div>
             <div style="text-align: center; padding: 20px; background: #f1f5f9; border-radius: 8px;">
-              <h3 style="color: #8b5cf6; margin: 0; font-size: 32px;">2,340</h3>
+              <h3 style="color: #1f2937; margin: 0; font-size: 32px;">2,340</h3>
               <p style="color: #6b7280; margin: 5px 0 0 0;">New Users</p>
             </div>
           </div>
@@ -115,7 +115,7 @@ const emailTemplates = [
     categoryId: "Promotion",
     htmlContent: `
       <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-        <div style="background: linear-gradient(135deg, #dc2626, #f59e0b); padding: 40px 20px; text-align: center;">
+        <div style="background: #1f2937; padding: 40px 20px; text-align: center;">
           <h1 style="color: white; margin: 0; font-size: 36px;">Holiday Sale</h1>
           <p style="color: white; margin: 10px 0 0 0; font-size: 18px;">Up to 50% Off Everything</p>
         </div>
@@ -125,13 +125,13 @@ const emailTemplates = [
             Don't miss out on our biggest sale of the year. Shop now and save big on all your favorite items.
           </p>
           <div style="text-align: center; margin-bottom: 30px;">
-            <div style="background: #dc2626; color: white; padding: 20px; border-radius: 8px; display: inline-block;">
+            <div style="background: #1f2937; color: white; padding: 20px; border-radius: 8px; display: inline-block;">
               <h3 style="margin: 0; font-size: 24px;">50% OFF</h3>
               <p style="margin: 5px 0 0 0;">Use code: HOLIDAY50</p>
             </div>
           </div>
           <div style="text-align: center;">
-            <a href="#" style="background: #8b5cf6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
+            <a href="#" style="background: #1f2937; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;">
               Shop Sale
             </a>
           </div>
@@ -150,7 +150,7 @@ const emailTemplates = [
           <h1 style="color: #1f2937; text-align: center; margin-bottom: 30px;">We Value Your Feedback</h1>
           <div style="text-align: center; margin-bottom: 30px;">
             <div style="background: #f1f5f9; padding: 30px; border-radius: 12px;">
-              <h2 style="color: #8b5cf6; margin: 0 0 15px 0;">Quick Survey</h2>
+              <h2 style="color: #1f2937; margin: 0 0 15px 0;">Quick Survey</h2>
               <p style="color: #6b7280; margin: 0;">Help us improve by sharing your thoughts</p>
             </div>
           </div>
@@ -158,7 +158,7 @@ const emailTemplates = [
             Your opinion matters to us. Take 2 minutes to complete our survey and help us serve you better.
           </p>
           <div style="text-align: center;">
-            <a href="#" style="background: #8b5cf6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
+            <a href="#" style="background: #1f2937; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">
               Take Survey
             </a>
           </div>
@@ -210,7 +210,7 @@ const Mini = [
     categoryId: "Internship",
     htmlContent: `
       <div style="max-width:600px; margin:0 auto; font-family:Arial,sans-serif;">
-        <h2 style="color:#1f2937;">Welcome, Intern!</h2>
+        <h2 >Welcome, Intern!</h2>
         <p style="color:#555;">Congratulations on joining our internship program.</p>
         <p style="color:#555;">This will be a time to learn, contribute, and grow alongside professionals in your field.</p>
         <p style="color:#9ca3af; font-size:14px;">We’re excited to mentor and support you throughout this journey.</p>
@@ -377,7 +377,7 @@ const welcomeTemplates = [
     categoryId: "Education",
     htmlContent: `
       <div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">
-  <div style="background: linear-gradient(135deg, #8b5cf6, #3b82f6); padding: 40px 20px; text-align: center;">
+  <div style="background: #1f2937; padding: 40px 20px; text-align: center;">
     <h1 style="color: white; margin: 0; font-size: 32px;">Thank You!</h1>
     <p style="color: #e0e7ff; margin: 15px 0 0 0; font-size: 18px;">Your contribution makes a difference</p>
   </div>
@@ -438,8 +438,14 @@ function seedTemplates() {
     console.log(`Created template with ID: ${createdTemplate.id}`);
   });
 }
+function deleteAllTemplates() {
+  prisma.emailTemplates.deleteMany().then((res) => {
+    console.log(`Deleted ${res.count} templates`);
+  });
+}
+// deleteAllTemplates();
 
 
-seedWelcomeTemplates();
+// seedWelcomeTemplates();
 // seedTemplates();
 

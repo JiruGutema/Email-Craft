@@ -125,7 +125,7 @@ export default function FavoritesPage() {
 
   const handleUseTemplate = (body: string) => {
     const draft = {
-      to: [""],
+      to: [],
       subject: "",
       body: body,
     };
