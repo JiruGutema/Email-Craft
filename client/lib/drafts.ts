@@ -1,39 +1,34 @@
 import { apiFetch } from "./api";
 import { DraftData, EmailData } from "./types";
 
-export async function saveDraft(body: DraftData, token: string) {
+export async function saveDraft(body: DraftData) {
   return apiFetch("/drafts", {
     method: "POST",
     body: body,
-    token: token,
   });
 }
 
-export async function getDrafts(token: string) {
+export async function getDrafts() {
   return apiFetch("/drafts", {
     method: "GET",
-    token: token,
   });
 }
 
-export async function deleteDraft(id: string, token: string) {
+export async function deleteDraft(id: string) {
   return apiFetch(`/drafts/${id}`, {
     method: "DELETE",
-    token: token,
   });
 }
 
-export async function updateDraft(id: string, body: DraftData, token: string) {
+export async function updateDraft(id: string, body: DraftData) {
   return apiFetch(`/drafts/${id}`, {
     method: "PUT",
     body: body,
-    token: token,
   });
 }
 
-export async function getDraft(id: string, token: string) {
+export async function getDraft(id: string) {
   return apiFetch(`/drafts/${id}`, {
     method: "GET",
-    token: token,
   });
 }

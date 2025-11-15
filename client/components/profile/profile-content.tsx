@@ -18,7 +18,7 @@ import {
   DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { getToken, HandleLogout, Logger } from "@/lib/utils";
+import { HandleLogout, Logger } from "@/lib/utils";
 import { deleteMe, getUserProfile } from "@/lib/user";
 import { set } from "react-hook-form";
 import { Description } from "@radix-ui/react-toast";
@@ -42,7 +42,7 @@ export function ProfileContent() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await getUserProfile(getToken() || "");
+        const res = await getUserProfile();
 
         if (res.status === 401) {
           localStorage.removeItem("user");
@@ -91,7 +91,7 @@ export function ProfileContent() {
 
     const fetchDraftsCount = async () => {
       try {
-        const drafts = await getDrafts(getToken() || "");
+        const drafts = await getDrafts();
         if (!drafts.ok) {
           Logger.error(
             "Failed to fetch drafts:",
@@ -130,7 +130,7 @@ export function ProfileContent() {
     setIsDeleting(true);
 
     try {
-      const res = await deleteMe(getToken() || "");
+      const res = await deleteMe();
       const data = await res.json().catch(() => null);
       Logger.log(data);
 

@@ -7,7 +7,6 @@ export interface ApiOptions {
   method?: string;
   headers?: Record<string, string>;
   body?: any;
-  token?: string;
 }
 
 export async function apiFetch(
@@ -21,18 +20,16 @@ export async function apiFetch(
     'Content-Type': 'application/json',
     ...options.headers,
   };
-  if (options.token) {
-    headers['Authorization'] = `Bearer ${options.token}`;
-  }
 
   const fetchOptions: RequestInit = {
     method: options.method || 'GET',
     headers,
+    credentials: 'include',
   };
   if (options.body) {
     fetchOptions.body = JSON.stringify(options.body);
   }
-
+  
   const res = await fetch(url, fetchOptions);
 
   return res;

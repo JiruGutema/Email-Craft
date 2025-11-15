@@ -1,5 +1,5 @@
 import { apiFetch } from "./api";
-import { CategoryData, DraftData, EmailData } from "./types";
+import { CategoryData} from "./types";
 
 export async function getCategories() {
   return apiFetch("/categories", {
@@ -7,25 +7,22 @@ export async function getCategories() {
   });
 }
 
-export async function createCategories(data: CategoryData, token: string) {
+export async function createCategories(data: CategoryData) {
   return apiFetch(`/categories`, {
     method: "POST",
     body: data,
-    token: token,
   });
 }
 
-export async function updateCategory(id: string, body: CategoryData, token: string) {
+export async function updateCategory(id: string, body: CategoryData) {
   return apiFetch(`/categories/${id}`, {
     method: "PUT",
     body: body,
-    token: token,
   });
 }
 
-export async function deleteCategory(id: string, token: string) {
+export async function deleteCategory(id: string) {
   return apiFetch(`/categories/${id}`, {
     method: "DELETE",
-    token: token,
   });
 }

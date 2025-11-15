@@ -17,7 +17,7 @@ import { getTemplates } from "@/lib/template";
 import { getCategories } from "@/lib/category";
 import { toast } from "@/hooks/use-toast";
 import Spinner from "../spinner";
-import { getToken, Logger } from "@/lib/utils";
+import { Logger } from "@/lib/utils";
 import { addFavorite, getFavorites } from "@/lib/favourite";
 import { EmailData, favouriteData, TemplateData } from "@/lib/types";
 
@@ -70,7 +70,7 @@ export default function FavoritesPage() {
 
     async function fetchFavorites() {
       try {
-        const res = await getFavorites(getToken() || "");
+        const res = await getFavorites();
         if (res.status === 401) {
           toast({
             description: "Session expired. Please log in again.",
@@ -226,7 +226,7 @@ export default function FavoritesPage() {
 
                             const res = await addFavorite(
                               template.id,
-                              getToken() || ""
+                              
                             );
                             if (res.status === 401) {
                               toast({
@@ -321,7 +321,7 @@ export default function FavoritesPage() {
 
                                     const res = await addFavorite(
                                       template.id,
-                                      getToken() || ""
+                                     
                                     );
                                     if (res.status === 401) {
                                       toast({

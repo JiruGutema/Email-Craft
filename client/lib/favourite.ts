@@ -1,22 +1,19 @@
 import { apiFetch } from "./api";
 
-export async function getFavorites(token: string) {
+export async function getFavorites() {
   return apiFetch("/templates/favourites", {
     method: "GET",
-    token: token,
   });
 }
 
-export async function addFavorite(id: string, token: string) {
+export async function addFavorite(id: string) {
   return apiFetch(`/templates/favourites/${id}`, {
     method: "POST",
-    token: token,
   });
 }
 
-export async function deleteFavorite(id: string, token: string) {
+export async function deleteFavorite(id: string) {
   return apiFetch(`/templates/favourites/${id}`, {
     method: "DELETE",
-    token: token,
   });
 }

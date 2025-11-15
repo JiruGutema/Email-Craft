@@ -8,8 +8,8 @@ export default function LoginSuccess() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
     const user = params.get("user");
+    const logged_in = params.get("logged_in")
     const idx_cache = localStorage.getItem("idx_cache");
 
     if (
@@ -23,10 +23,10 @@ export default function LoginSuccess() {
       localStorage.setItem("user", user);
       localStorage.setItem("idx_cache", JSON.parse(user).id);
     }
-    if (token) {
-      localStorage.setItem("token", token);
-      router.replace("/composer");
+    if (logged_in) {
+      localStorage.setItem("logged_in", "true");
     }
+    router.replace("/composer");
   }, [router]);
 
   return (

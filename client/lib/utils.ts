@@ -7,31 +7,31 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function AuthGuard() {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  return !!token;
+  const logged_in =
+    typeof window !== "undefined" ? localStorage.getItem("logged_in") : null;
+  return !!logged_in;
 }
 
 export async function HandleLogout() {
  Logger.log('Logging out the user!') 
   try {
-    const token = getToken();
-      await logout(token || '');
+    const logged_in = getLoggedIn();
+      await logout();
   } catch (err) {
     console.error("Logout API failed:", err);
   } finally {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("token");
+      localStorage.removeItem("logged_in");
       localStorage.removeItem("user");
       window.location.href = "/";
     }
   }
 }
 
-export function getToken() {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : "";
-  return token;
+export function getLoggedIn() {
+  const logged_in =
+    typeof window !== "undefined" ? localStorage.getItem("logged_in") : "";
+  return logged_in;
 }
 
 export function ApiBaseUrl(): string {

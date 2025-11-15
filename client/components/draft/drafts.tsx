@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { deleteDraft, getDrafts } from "@/lib/drafts";
-import { getToken, Logger } from "@/lib/utils";
+import { Logger } from "@/lib/utils";
 import { set } from "react-hook-form";
 import { toast } from "@/hooks/use-toast";
 import { Draft } from "@/lib/types";
@@ -35,7 +35,7 @@ export default function DraftsPage() {
   useEffect(() => {
     try {
       const fetchDrafts = async () => {
-        const drafts = await getDrafts(getToken() || "");
+        const drafts = await getDrafts();
         if (drafts.status === 401) {
           toast({
             description: "Session expired. Please logout and then login.",
@@ -89,7 +89,7 @@ export default function DraftsPage() {
   };
 
   const handleDelete = async (draftId: string) => {
-    const draft = await deleteDraft(draftId, getToken() || "");
+    const draft = await deleteDraft(draftId);
     if (draft.ok) {
       setDrafts(drafts.filter((draft) => draft.id !== draftId));
       toast({ description: "Draft deleted successfully" });

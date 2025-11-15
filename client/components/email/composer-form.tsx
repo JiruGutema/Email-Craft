@@ -11,7 +11,7 @@ import Prism from "prismjs";
 import "prismjs/themes/prism.css";
 import "prismjs/components/prism-markup"; // For HTML highlighting
 import { sendEmail } from "@/lib/email";
-import { getToken, HandleLogout, Logger } from "@/lib/utils";
+import {  HandleLogout, Logger } from "@/lib/utils";
 import { saveDraft } from "@/lib/drafts";
 import { toast } from "@/hooks/use-toast";
 
@@ -54,7 +54,7 @@ export function ComposerForm() {
 
   const handleSessionExpired = () => {
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
+    localStorage.removeItem("logged_in");
     toast({
       description: "Session expired. Please log in again.",
       variant: "destructive",
@@ -67,7 +67,7 @@ export function ComposerForm() {
   const handleSendEmail = async () => {
     setIsSending(true);
     try {
-      const response = await sendEmail(emailData, getToken() || "");
+      const response = await sendEmail(emailData);
       const resData = await response.json().catch(() => null);
 
       if (response.status === 401) {
@@ -107,7 +107,7 @@ export function ComposerForm() {
     }
 
     try {
-      const response = await saveDraft(emailData, getToken() || "");
+      const response = await saveDraft(emailData);
       const resData = await response.json().catch(() => null);
 
       if (response.status === 401) {

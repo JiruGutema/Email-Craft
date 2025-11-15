@@ -7,24 +7,21 @@ export async function loginUser(email: string, password: string) {
   });
 }
 
-export async function getUserProfile(token: string): Promise<Response> {
+export async function getUserProfile(): Promise<Response> {
   return apiFetch("/auth/me", {
     method: "GET",
-    token: token,
   });
 }
 
-export async function deleteMe(token:string): Promise<Response> {
+export async function deleteMe(): Promise<Response> {
    return apiFetch("/auth/delete", {
      method: "DELETE",
-     token: token,
    });
 }
 
-export async function logout(token:string): Promise<Response> {
+export async function logout(): Promise<Response> {
   return apiFetch("/auth/logout", {
     method: "POST",
-    token: token,
   });
 }
 
