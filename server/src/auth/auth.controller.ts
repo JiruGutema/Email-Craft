@@ -93,7 +93,7 @@ export class AuthController {
     // Set cookie
     res.cookie('access_token', token, {
       httpOnly: true, // prevents JS access (important!)
-      secure: false, // use true in production (HTTPS)
+      secure: true, // use true in production (HTTPS)
       sameSite: 'none', // or 'none' if using cross-site requests
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -101,7 +101,7 @@ export class AuthController {
     // Optional: send user data too (NOT as httpOnly)
     res.cookie('user', JSON.stringify(req.user), {
       httpOnly: false,
-      secure: false,
+      secure: true,
       sameSite: 'none',
     });
 
