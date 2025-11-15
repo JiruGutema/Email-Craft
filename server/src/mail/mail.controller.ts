@@ -5,6 +5,7 @@ import { UpdateMailDto } from './dto/update-mail.dto';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { SendEmailGuard } from './guards/sendEmail.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Logger } from 'src/utils/utils';
 
 @ApiTags('Mail')
 @Controller('mail')

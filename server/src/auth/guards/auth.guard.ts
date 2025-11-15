@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { PrismaClient } from '@prisma/client';
@@ -8,41 +13,49 @@ const Prisma = new PrismaClient();
 export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const authorization = request.headers.authorization;
-    const token = authorization ? authorization.split(' ')[1] : null;
+
+    // Prefer token from cookies (e.g. access_token), fallback to Authorization header.
+    const cookies = request.cookies || {};
+    let token: string | null = cookies['access_token'];
+
     if (!token) {
-      throw new UnauthorizedException("No token provided");
+      const authorization = request.headers?.authorization;
+      token = authorization ? authorization.split(' ')[1] : null;
     }
+    if (!token) {
+      throw new UnauthorizedException(
+        'No token provided in cookies or Authorization header',
+      );
+    }
+
     try {
-        
-        const tokenPayload = await this.jwtService.verifyAsync(token);
-        request.user = {
-          userId: tokenPayload.sub,
-          username: tokenPayload.username,
-          role: tokenPayload.role, 
-        };
+      const tokenPayload = await this.jwtService.verifyAsync(token);
+      request.user = {
+        userId: tokenPayload.sub,
+        username: tokenPayload.username,
+        role: tokenPayload.role,
+      };
       return true;
-    } catch (error) {
-      if (error.name === 'TokenExpiredError') {
+    } catch (error: any) {
+      if (error?.name === 'TokenExpiredError') {
         throw new UnauthorizedException('Token expired');
       }
       throw new UnauthorizedException('Invalid token');
     }
   }
-
 }
 
 @Injectable()
-export class CanLogin implements CanActivate{
+export class CanLogin implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const user = request.body;
-    if (user && user.password === "_google_oauth_user_") {
-      throw new UnauthorizedException("Google OAuth users are not allowed. Try logging in with Google.");
+    if (user && user.password === '_google_oauth_user_') {
+      throw new UnauthorizedException(
+        'Google OAuth users are not allowed. Try logging in with Google.',
+      );
     }
     return true;
   }

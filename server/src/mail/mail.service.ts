@@ -55,7 +55,8 @@ export class MailService {
         userId: 'me',
         requestBody: { raw: encodedMessage },
       });
-      return { message: 'Email sent successfully!' };
+
+    
     } catch (error) {
       // Only try to refresh if access token expired and refresh token exists
       if (

@@ -8,6 +8,7 @@ import {
   Request,
   Req,
   Redirect,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, SignupUserDto } from './dto/auth.dto';
@@ -35,10 +36,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout user' })
   @Post('logout')
   logout(@Req() req) {
-    const userId = req.user.userId
+    const userId = req.user.userId;
     return this.authService.logout(userId);
   }
-
 
   @ApiOperation({ summary: 'Signup user' })
   @Post('signup')
@@ -56,7 +56,7 @@ export class AuthController {
   @Get('google/login')
   async loginGoogle() {}
 
-  @Get("is-admin")
+  @Get('is-admin')
   @UseGuards(AuthGuard)
   isAdmin(@Req() req) {
     return req.user.role === 'admin';
@@ -68,15 +68,45 @@ export class AuthController {
     return req.user.role === 'superadmin';
   }
 
+  // @Redirect(`${process.env.CLIENT_RID_URL}/login/success`, 302)
+  // async googleAuthRedirect(@Request() req) {
+  //   const payload = { username: req.user.username, sub: req.user.id, role: req.user.role };
+  //   const token = await this.jwtService.signAsync(payload);
+  //   return {
+  //     url: `${process.env.CLIENT_RID_URL}/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
+  //   };
+  // }
+
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  @Redirect(`${process.env.CLIENT_RID_URL}/login/success`, 302)
-  async googleAuthRedirect(@Request() req) {
-    const payload = { username: req.user.username, sub: req.user.id, role: req.user.role };
-    const token = await this.jwtService.signAsync(payload);
-    return {
-      url: `${process.env.CLIENT_RID_URL}/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
+  async googleAuthRedirect(@Request() req, @Res({ passthrough: true }) res) {
+    const payload = {
+      username: req.user.username,
+      sub: req.user.id,
+      role: req.user.role,
     };
+
+    const token = await this.jwtService.signAsync(payload, {
+      expiresIn: '7d', // optional
+    });
+
+    // Set cookie
+    res.cookie('access_token', token, {
+      httpOnly: true, // prevents JS access (important!)
+      secure: false, // use true in production (HTTPS)
+      sameSite: 'none', // or 'none' if using cross-site requests
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    // Optional: send user data too (NOT as httpOnly)
+    res.cookie('user', JSON.stringify(req.user), {
+      httpOnly: false,
+      secure: false,
+      sameSite: 'none',
+    });
+
+    // Redirect to frontend
+    return res.redirect(`${process.env.CLIENT_RID_URL}/login/success?user=${encodeURIComponent(JSON.stringify(req.user))}&logged_in=true`);
   }
 
   @UseGuards(AuthGuard)
@@ -84,5 +114,4 @@ export class AuthController {
   async delete(@Request() req) {
     return await this.authService.delete(req.user.userId);
   }
-
 }

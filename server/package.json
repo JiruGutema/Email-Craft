@@ -31,6 +31,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@prisma/client": "^6.15.0",
     "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "googleapis": "^159.0.0",
     "nanoid": "^5.1.5",
     "passport-google-oauth20": "^2.0.0",
