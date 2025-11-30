@@ -7,7 +7,6 @@ import {
   UseGuards,
   Request,
   Req,
-  Redirect,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -105,8 +104,16 @@ export class AuthController {
       sameSite: 'none',
     });
 
+    res.cookie('logged_in', 'true', {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+    });
+
     // Redirect to frontend
-    return res.redirect(`${process.env.CLIENT_RID_URL}/login/success?user=${encodeURIComponent(JSON.stringify(req.user))}&logged_in=true`);
+    return res.redirect(
+      `${process.env.CLIENT_RID_URL}/login/success`,
+    );
   }
 
   @UseGuards(AuthGuard)

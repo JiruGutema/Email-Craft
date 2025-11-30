@@ -13,10 +13,9 @@ export function AuthGuard() {
 }
 
 export async function HandleLogout() {
- Logger.log('Logging out the user!') 
+  Logger.log("Logging out the user!");
   try {
-    const logged_in = getLoggedIn();
-      await logout();
+    await logout();
   } catch (err) {
     console.error("Logout API failed:", err);
   } finally {
@@ -28,21 +27,41 @@ export async function HandleLogout() {
   }
 }
 
-export function getLoggedIn() {
-  const logged_in =
-    typeof window !== "undefined" ? localStorage.getItem("logged_in") : "";
-  return logged_in;
-}
-
 export function ApiBaseUrl(): string {
   return process.env.NEXT_PUBLIC_API_BASE_URL?.toString() || "";
 }
 
-export function getLocalUser(){
-  const user = typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null;
-  return  user
+export function getLocalUser() {
+  if (typeof document === "undefined") return null; // SSR / non-browser guard
+
+  function getUserFromCookie() {
+    const match = document.cookie.match(/(?:^|;\s*)user=([^;]*)/);
+    if (!match) return null;
+    try {
+      return JSON.parse(decodeURIComponent(match[1]));
+    } catch {
+      return null;
+    }
+  }
+
+  return getUserFromCookie();
 }
 
+export function getLoggedIn() {
+  if (typeof document === "undefined") return false; // SSR / non-browser guard
+
+  function getLoggedInFromCookie() {
+    const match = document.cookie.match(/(?:^|;\s*)logged_in=([^;]*)/);
+    if (!match) return null;
+    try {
+      return decodeURIComponent(match[1]);
+    } catch {
+      return null;
+    }
+  }
+
+  return getLoggedInFromCookie() ? true : false;
+}
 const isDevelopment = process.env.NEXT_PUBLIC_NODE_ENV === "development";
 
 export const Logger = {

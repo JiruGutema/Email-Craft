@@ -148,58 +148,32 @@ export default function Home() {
               </Button>
               {isAuthenticated ? (
                 <>
-                <Link href="/profile">
-                  {user?.picture ? (
-                    <img
-                      src={`${user?.picture || "/default-profile.png"}`}
-                      alt=""
-                      className="h-10 w-10 rounded-full border border-border"
-                    />
-                  ) : (
-                    <User className="h-6 w-6 text-muted-foreground" />
-                  )}
-                </Link>
-       <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-foreground bg-transparent"
-                >
-                  <LogOutIcon className="h-4 w-4" />
-                  Logout
-                </Button>
-              </DialogTrigger>
-
-              <DialogOverlay className="fixed z-20 inset-0 bg-black/50" />
-
-              <DialogContent className="fixed top-1/2 left-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-foreground p-6 shadow-lg text-background">
-                <DialogHeader>
-                  <DialogTitle>Are you sure?</DialogTitle>
-                  <DialogDescription>
-                    Are you sure you want to log out?
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button
-                      variant="outline"
-                      className="text-foreground"
-                      disabled={isLoggingOut}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogClose>
-                  <Button
-                    variant="destructive"
-                    onClick={HandleLogout}
-                    disabled={isLoggingOut}
+                  <Link href="/profile">
+                    {user?.picture ? (
+                      <img
+                        src={`${user?.picture || "/default-profile.png"}`}
+                        alt=""
+                        className="h-10 w-10 rounded-full border border-border"
+                      />
+                    ) : (
+                      <User className="h-6 w-6 text-muted-foreground" />
+                    )}
+                  </Link>
+                  <Dialog
+                    open={showLogoutDialog}
+                    onOpenChange={setShowLogoutDialog}
                   >
-                    {isLoggingOut ? "Logging out..." : "Yes, log me out"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-            </>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-foreground bg-green"
+                      >
+                        <LogOutIcon className="h-4 w-4" />
+                        Logout
+                      </Button>
+                    </DialogTrigger>
+                  </Dialog>
+                </>
               ) : (
                 <>
                   <Link href="/login">
@@ -215,14 +189,45 @@ export default function Home() {
                       Sign Up
                     </Button>
                   </Link>
-
                 </>
               )}
-     
             </div>
           </div>
         </div>
       </header>
+
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogTrigger asChild></DialogTrigger>
+
+        <DialogOverlay className="fixed inset-0 z-40 bg-black/50" />
+
+        <DialogContent className="fixed top-1/2 left-1/2 z-50 w-[90%] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg bg-foreground p-6 shadow-lg text-background">
+          <DialogHeader>
+            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                variant="outline"
+                className="text-foreground"
+                disabled={isLoggingOut}
+              >
+                Cancel
+              </Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={HandleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Logging out..." : "Yes, log me out"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Hero Section */}
       <section className="py-20 lg:py-32">
@@ -254,7 +259,7 @@ export default function Home() {
                 onClick={() =>
                   window.open(
                     "https://www.youtube.com/watch?v=Abs08REbc4o&t=4s",
-                    "_blank"
+                    "_blank",
                   )
                 }
               >
