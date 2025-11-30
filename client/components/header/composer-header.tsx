@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { HandleLogout } from "@/lib/utils";
+import { getLocalUser, HandleLogout } from "@/lib/utils";
 import {
   Dialog,
   DialogTrigger,
@@ -24,10 +24,7 @@ export function ComposerHeader({
   onProfileClick,
   onBack,
 }: ComposerHeaderProps) {
-  const user =
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null;
+  const user = getLocalUser();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   return (

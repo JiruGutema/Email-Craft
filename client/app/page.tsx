@@ -11,7 +11,7 @@ import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { subscribe } from "@/lib/subscribe";
-import { AuthGuard, HandleLogout, Logger } from "@/lib/utils";
+import { AuthGuard, getLocalUser, HandleLogout, Logger } from "@/lib/utils";
 import {
   Dialog,
   DialogTrigger,
@@ -45,10 +45,8 @@ export default function Home() {
       const isAuth = AuthGuard();
       setIsAuthenticated(isAuth);
     };
-    const user =
-      typeof window !== "undefined"
-        ? JSON.parse(localStorage.getItem("user") || "null")
-        : null;
+    const user = getLocalUser();
+    
     setUser(user);
     checkAuth();
   }, []);
@@ -166,7 +164,7 @@ export default function Home() {
                     <DialogTrigger asChild>
                       <Button
                         variant="outline"
-                        className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-foreground bg-green"
+                        className="w-30 justify-start mt-0 text-red-500 hover:text-background border-red-500 hover:bg-red-500 bg-green"
                       >
                         <LogOutIcon className="h-4 w-4" />
                         Logout
@@ -255,7 +253,7 @@ export default function Home() {
               <Button
                 size="lg"
                 variant="outline"
-                className="bg-blue-500 text-white hover:bg-blue-600"
+                className="bg-red-500 text-white hover:bg-red-600"
                 onClick={() =>
                   window.open(
                     "https://www.youtube.com/watch?v=Abs08REbc4o&t=4s",
@@ -428,9 +426,12 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="outline">
-                Demo
-              </Button>
+                <a href="https://www.youtube.com/watch?v=Abs08REbc4o&t=4s" target="_blank" rel="noopener noreferrer">
+                <Button size="lg" variant="outline" className="bg-red-500 text-white hover:bg-red-600" >
+
+                  Demo
+                </Button>
+                </a>
             </div>
           </div>
         </div>
