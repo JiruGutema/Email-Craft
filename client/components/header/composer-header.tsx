@@ -83,7 +83,11 @@ export function ComposerHeader({
             </DialogHeader>
             <DialogFooter>
               <DialogClose asChild>
-                <Button variant="outline" className="text-foreground" disabled={isLoggingOut}>
+                <Button
+                  variant="outline"
+                  className="text-foreground"
+                  disabled={isLoggingOut}
+                >
                   Cancel
                 </Button>
               </DialogClose>

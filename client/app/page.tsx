@@ -46,7 +46,7 @@ export default function Home() {
       setIsAuthenticated(isAuth);
     };
     const user = getLocalUser();
-    
+
     setUser(user);
     checkAuth();
   }, []);
@@ -426,12 +426,19 @@ export default function Home() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-                <a href="https://www.youtube.com/watch?v=Abs08REbc4o&t=4s" target="_blank" rel="noopener noreferrer">
-                <Button size="lg" variant="outline" className="bg-red-500 text-white hover:bg-red-600" >
-
+              <a
+                href="https://www.youtube.com/watch?v=Abs08REbc4o&t=4s"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-red-500 text-white hover:bg-red-600"
+                >
                   Demo
                 </Button>
-                </a>
+              </a>
             </div>
           </div>
         </div>
