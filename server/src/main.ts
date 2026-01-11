@@ -9,7 +9,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3001',
-      'https://email-craft-olive.vercel.app', // frontend URL
+      'https://email-craft-olive.vercel.app',
+      process.env.CLIENT_URL || 'https://email-craft-olive.vercel.app', 
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,

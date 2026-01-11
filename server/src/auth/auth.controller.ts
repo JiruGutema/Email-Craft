@@ -34,8 +34,21 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: 'Logout user' })
   @Post('logout')
-  logout(@Req() req) {
+  logout(@Req() req, @Res({ passthrough: true }) res) {
     const userId = req.user.userId;
+    
+    // Clear all auth cookies
+    const clearCookieOptions = {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const,
+      path: '/',
+    };
+
+    res.clearCookie('access_token', { ...clearCookieOptions, httpOnly: true });
+    res.clearCookie('user', clearCookieOptions);
+    res.clearCookie('logged_in', clearCookieOptions);
+    
     return this.authService.logout(userId);
   }
 
@@ -67,18 +80,9 @@ export class AuthController {
     return req.user.role === 'superadmin';
   }
 
-  // @Redirect(`${process.env.CLIENT_RID_URL}/login/success`, 302)
-  // async googleAuthRedirect(@Request() req) {
-  //   const payload = { username: req.user.username, sub: req.user.id, role: req.user.role };
-  //   const token = await this.jwtService.signAsync(payload);
-  //   return {
-  //     url: `${process.env.CLIENT_RID_URL}/login/success?token=${token}&user=${encodeURIComponent(JSON.stringify(req.user))}`,
-  //   };
-  // }
-
   @UseGuards(GoogleAuthGuard)
   @Get('google/callback')
-  async googleAuthRedirect(@Request() req, @Res({ passthrough: true }) res) {
+  async googleAuthRedirect(@Request() req, @Res() res) {
     const payload = {
       username: req.user.username,
       sub: req.user.id,
@@ -86,34 +90,40 @@ export class AuthController {
     };
 
     const token = await this.jwtService.signAsync(payload, {
-      expiresIn: '7d', // optional
+      expiresIn: '7d',
     });
 
-    // Set cookie
-    res.cookie('access_token', token, {
-      httpOnly: true, // prevents JS access (important!)
-      secure: true, // use true in production (HTTPS)
-      sameSite: 'none', // or 'none' if using cross-site requests
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    // Base cookie options
+    const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction, // Only secure in production (HTTPS)
+      sameSite: isProduction ? 'none' as const : 'lax' as const, // 'none' for cross-origin in production
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    });
+      path: '/', // Ensure cookies are available on all paths
+    };
 
-    // Optional: send user data too (NOT as httpOnly)
+    // Don't set domain for cross-origin cookies - let browser handle it
+    // The domain restriction was causing the issue
+
+    console.log('🍪 Setting cookies with options:', cookieOptions);
+    console.log('🍪 isProduction:', isProduction);
+    console.log('🍪 CLIENT_RID_URL:', process.env.CLIENT_RID_URL);
+
+    res.cookie('access_token', token, cookieOptions);
+
     res.cookie('user', JSON.stringify(req.user), {
-      httpOnly: false,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
+      httpOnly: false, // Client needs to read this
     });
 
     res.cookie('logged_in', 'true', {
-      httpOnly: false,
-      secure: true,
-      sameSite: 'none',
+      ...cookieOptions,
+      httpOnly: false, // Client needs to read this
     });
 
-    // Redirect to frontend
-    return res.redirect(
-      `${process.env.CLIENT_RID_URL}/login/success`,
-    );
+    return res.redirect(`${process.env.CLIENT_RID_URL}/login/success`);
   }
 
   @UseGuards(AuthGuard)
