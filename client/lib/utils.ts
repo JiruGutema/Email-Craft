@@ -7,9 +7,24 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function AuthGuard() {
-  const logged_in =
+  // Check localStorage first (faster)
+  const localStorageAuth =
     typeof window !== "undefined" ? localStorage.getItem("logged_in") : null;
-  return !!logged_in;
+
+  if (localStorageAuth) {
+    return true;
+  }
+
+  // Fallback to cookies if localStorage is missing
+  const cookieAuth = getLoggedIn();
+
+  if (cookieAuth && typeof window !== "undefined") {
+    // Sync localStorage with cookie state
+    localStorage.setItem("logged_in", "true");
+    return true;
+  }
+
+  return false;
 }
 
 export async function HandleLogout() {
@@ -17,7 +32,7 @@ export async function HandleLogout() {
   try {
     await logout();
   } catch (err) {
-    console.error("Logout API failed:", err);
+    console.error("Logout API failed:");
   } finally {
     if (typeof window !== "undefined") {
       localStorage.removeItem("logged_in");
@@ -52,15 +67,18 @@ export function getLoggedIn() {
 
   function getLoggedInFromCookie() {
     const match = document.cookie.match(/(?:^|;\s*)logged_in=([^;]*)/);
+
     if (!match) return null;
     try {
-      return decodeURIComponent(match[1]);
+      const decoded = decodeURIComponent(match[1]);
+      return decoded;
     } catch {
       return null;
     }
   }
 
-  return getLoggedInFromCookie() ? true : false;
+  const result = getLoggedInFromCookie();
+  return result ? true : false;
 }
 const isDevelopment = process.env.NEXT_PUBLIC_NODE_ENV === "development";
 

@@ -1,28 +1,27 @@
-'use client'
-import { ComposerSidebar } from "@/components/sidebar/composer-sidebar"
-import { ComposerHeader } from "@/components/header/composer-header"
-import { ComposerForm } from "@/components/email/composer-form"
-import { useEffect, useState } from "react"
-import { AuthGuard } from "@/lib/utils"
-import { useRouter } from "next/navigation"
-import Spinner from "@/components/spinner"
+"use client";
+import { ComposerSidebar } from "@/components/sidebar/composer-sidebar";
+import { ComposerHeader } from "@/components/header/composer-header";
+import { ComposerForm } from "@/components/email/composer-form";
+import { useEffect, useState } from "react";
+import { AuthGuard } from "@/lib/utils";
+import { useRouter } from "next/navigation";
+import Spinner from "@/components/spinner";
 
 export default function ComposerPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const auth = AuthGuard()
-    setIsAuthenticated(auth)
+    const auth = AuthGuard();
+    setIsAuthenticated(auth);
     if (!auth) {
-      router.replace("/login")
+      router.replace("/login");
+    } else {
     }
-  }, [router])
+  }, [router]);
 
   if (!isAuthenticated) {
-    return (
-      <Spinner />
-    )
+    return <Spinner />;
   }
 
   return (
@@ -32,7 +31,7 @@ export default function ComposerPage() {
       <div className="flex-1">
         <ComposerHeader
           onProfileClick={() => {
-            window.location.href = "/profile"
+            router.push("/profile");
           }}
         />
 
@@ -41,5 +40,5 @@ export default function ComposerPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

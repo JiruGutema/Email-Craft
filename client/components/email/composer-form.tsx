@@ -53,8 +53,16 @@ export function ComposerForm() {
   }, [emailData]);
 
   const handleSessionExpired = () => {
-    localStorage.removeItem("user");
+    // Clear localStorage
     localStorage.removeItem("logged_in");
+    localStorage.removeItem("idx_cache");
+    localStorage.removeItem("composerFormCache");
+    
+    // Clear cookies by setting them to expire
+    document.cookie = "user=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "logged_in=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    
     toast({
       description: "Session expired. Please log in again.",
       variant: "destructive",
