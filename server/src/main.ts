@@ -6,12 +6,14 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  app.set('trust proxy', 1);
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
   app.enableCors({
     origin: [
       'http://localhost:3001',
       'https://email-craft-olive.vercel.app',
-      process.env.CLIENT_URL || 'https://email-craft-olive.vercel.app', 
+      process.env.CLIENT_URL || 'https://email-craft-olive.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
@@ -29,4 +31,3 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-
