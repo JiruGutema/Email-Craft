@@ -123,7 +123,16 @@ export class AuthController {
       httpOnly: false, // Client needs to read this
     });
 
-    return res.redirect(`${process.env.CLIENT_RID_URL}/login/success`);
+    res.send(`
+  <html>
+    <body>
+      <script>
+        window.location.href = "${process.env.CLIENT_RID_URL}/login/success";
+      </script>
+    </body>
+  </html>
+`);
+
   }
 
   @UseGuards(AuthGuard)
